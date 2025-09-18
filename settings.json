@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh pr list:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(git fetch:*)",
+      "Bash(git checkout:*)",
+      "Bash(git commit:*)",
+      "Bash(git add:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(git status:*)",
+      "Bash(find:*)",
+      "Bash(mvn:*)",
+      "Bash(rg:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "mcp__statements-mcp__search-catalog",
+      "mcp__statements-mcp__search-get-catalog-schemas",
+      "mcp__statements-mcp__spotify-get-episode",
+      "mcp__statements-mcp__spotify-get-show",
+      "mcp__statements-mcp__statements-get-entity-schema",
+      "mcp__statements-mcp__statements-get-statement",
+      "mcp__statements-mcp__statements-get-statement-history",
+      "mcp__statements-mcp__statements-get-entity",
+      "mcp__code-search__code_search",
+      "mcp__aika-search__internal_search",
+      "mcp__aika-search__list_data_sources",
+      "mcp__sequential-thinking__sequentialthinking",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs"
+    ]
+  }
+}
