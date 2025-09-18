@@ -191,4 +191,4 @@ When multiple valid approaches exist, choose based on:
 - Learn from existing implementations
 - Stop after 3 failed attempts and reassess
 
-Remember: Write code as if the person maintaining it is a violent psychopath who knows where you live. Make it that clear.
+**Remember: Write code as if the person maintaining it is a violent psychopath who knows where you live. Make it that clear.**
