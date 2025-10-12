@@ -1,4 +1,12 @@
 {
+  "env": {
+    "CLAUDE_CODE_USE_VERTEX": "1",
+    "ANTHROPIC_SMALL_FAST_MODEL": "claude-3-5-haiku@20241022",
+    "CLOUD_ML_REGION": "europe-west1",
+    "VERTEX_REGION_CLAUDE_4_1_OPUS": "europe-west4",
+    "VERTEX_REGION_CLAUDE_4_5_SONNET": "global",
+    "ANTHROPIC_VERTEX_PROJECT_ID": "spotify-claude-code-trial"
+  },
   "permissions": {
     "allow": [
       "Bash(gh pr list:*)",
@@ -34,5 +42,6 @@
       "mcp__context7__resolve-library-id",
       "mcp__context7__get-library-docs"
     ]
-  }
+  },
+  "alwaysThinkingEnabled": true
 }
