@@ -29,9 +29,7 @@
 
 There are several MCP servers and tools that you have access to, but only use them if the user asks you to or are required.
 
- - You can use statements-cli to extract information about an entity like episode, show, audiobook and audiobookChapter, use -h and my zsh history to figure out commands.
- - You can use statements-mcp mcp server to extract information about an entity and also are able to search through the catalogue.
- - Use aika-search mcp server to find internal information in techdocs, slack related to information I'm asking about.
+ - Use aika-search mcp server to find internal information in techdocs, slack related to information I'm asking about if needed.
  - Use code-search mcp server to look through github easily if needed, as we use github enterprise at ghe.spotify.net.
  - Use gh to look at Pull requests or commits.
 
@@ -55,6 +53,12 @@ Use `mcp__context7__resolve-library-id` for:
 
 Use `mcp__context7__get-library-docs` for:
 - Fetching up-to-date documentation for a library
+
+#### Statements MCP
+IMPORTANT: The below two MCPs should only be used if we need to debug an entity, there should be no reason to use them when doing feature development.
+
+ - You can use statements-cli to extract information about an entity like episode, show, audiobook and audiobookChapter, use -h and my zsh history to figure out commands, again only to debug an entity not for feature development.
+ - You can use statements-mcp mcp server to extract information about an entity and also are able to search through the catalogue, again only to debug an entity not for feature development.
 
 ### 2. Planning & Staging
 

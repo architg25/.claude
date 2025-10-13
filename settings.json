@@ -23,6 +23,7 @@
       "Bash(git push:*)",
       "Bash(find:*)",
       "Bash(mvn:*)",
+      "Bash(mvnd:*)",
       "Bash(rg:*)",
       "Bash(grep:*)",
       "Bash(ls:*)",
