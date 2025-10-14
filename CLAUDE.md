@@ -27,22 +27,36 @@
 
 ### 1. Mandatory MCP Tool Usage
 
-There are several MCP servers and tools that you have access to, but only use them if the user asks you to or are required.
+Use MCP tools when they're actually needed, not speculatively:
 
- - Use aika-search mcp server to find internal information in techdocs, slack related to information I'm asking about if needed.
- - Use code-search mcp server to look through github easily if needed, as we use github enterprise at ghe.spotify.net.
- - Use gh to look at Pull requests or commits.
+**Use aika-search when:**
+- Debugging Spotify internals without clear codebase pointers
+- Finding documentation or Slack discussions about systems/decisions
+- Understanding context for legacy code or design choices
 
-#### Sequential Thinking (FOR COMPLEX TASKS)
-Use `mcp__sequential-thinking__sequentialthinking` for:
-- ANY feature implementation (even "simple" ones have edge cases)
-- Debugging ANY issue (systematic analysis beats guessing)
-- Architecture decisions (consider all implications)
-- Performance optimizations (measure, analyze, implement)
-- Security implementations (threat model first)
-- Refactoring plans (understand current state fully)
-- API integrations (error cases, rate limits, costs)
-- State management changes (race conditions, cleanup)
+**Use code-search when:**
+- Finding usage patterns across multiple repos at ghe.spotify.net
+- Understanding how others solved similar problems
+- Verifying API usage before implementing
+
+**Use gh when:**
+- Examining specific PRs or commit history
+- Understanding recent changes affecting your work
+
+#### Sequential Thinking (FOR GENUINELY COMPLEX TASKS)
+Use `mcp__sequential-thinking__sequentialthinking` when:
+- Multi-file features or refactors (not simple edits)
+- Non-obvious bugs requiring systematic analysis (not typos/simple fixes)
+- Architecture decisions with multiple trade-offs
+- Performance optimizations requiring measurement and analysis
+- Security-sensitive implementations (threat modeling needed)
+- API integrations (error handling, rate limits, edge cases)
+- State management changes (race conditions, cleanup, side effects)
+
+DO NOT use for:
+- Typo fixes, simple bug fixes, or single-file changes
+- Well-understood patterns you're just copying
+- Trivial feature additions
 
 #### Context7 (FOR WORKING WITH EXTERNAL LIBRARIES)
 Use the below tools if we need to utilise an external library to work on a feature.
@@ -60,29 +74,34 @@ IMPORTANT: The below two MCPs should only be used if we need to debug an entity,
  - You can use statements-cli to extract information about an entity like episode, show, audiobook and audiobookChapter, use -h and my zsh history to figure out commands, again only to debug an entity not for feature development.
  - You can use statements-mcp mcp server to extract information about an entity and also are able to search through the catalogue, again only to debug an entity not for feature development.
 
-### 2. Planning & Staging
+### 2. Planning & Task Management
 
-Break complex work into 3-5 stages. Document in `IMPLEMENTATION_PLAN.md`:
+#### TodoWrite Usage
+Use the TodoWrite tool for tracking multi-step tasks:
+- Create todos at the start of complex work
+- Mark tasks `in_progress` BEFORE starting work
+- Complete tasks IMMEDIATELY after finishing (no batching)
+- Keep exactly ONE task in_progress at a time
 
-```markdown
-## Stage N: [Name]
-**Goal**: [Specific deliverable]
-**Success Criteria**: [Testable outcomes]
-**Tests**: [Specific test cases]
-**Status**: [Not Started|In Progress|Complete]
-```
-- Update status as you progress
-- Remove file when all stages are done
+#### When to Stop Planning and Start Coding
+- **<50 line changes**: Skip planning, just do it
+- **50-200 lines**: Quick todo list (3-5 items max)
+- **>200 lines or multi-file**: Detailed todo list with clear deliverables
+- **Complex features**: Break into stages with testable milestones
+
+If you're spending more time planning than coding, you're overthinking it.
 
 ### 3. Implementation Flow
 
 Use the repo's CLAUDE.md to figure out the structure of the repo first, including how to build and test.
 
 1. **Understand** - Study existing patterns in codebase
-2. **Test** - Write test first (red)
-3. **Implement** - Minimal code to pass (green)
-4. **Refactor** - Clean up with tests passing
-5. **Commit** - With clear message linking to plan
+2. **Test** - Write test first if interface is clear; after exploratory spike if not
+3. **Implement** - Minimal code to pass tests
+4. **Refactor** - Clean up with tests still passing
+5. **Commit** - With clear message explaining "why"
+
+Note: TDD is ideal but not dogma. Spike first if you need to explore the problem space.
 
 ### 4. When Stuck (After 3 Attempts)
 
@@ -191,8 +210,8 @@ When multiple valid approaches exist, choose based on:
 
 **ALWAYS**:
 - Commit working code incrementally
-- Update plan documentation as you go
-- Learn from existing implementations
-- Stop after 3 failed attempts and reassess
+- Update todo list as you complete tasks
+- Learn from existing implementations before writing new code
+- Stop after 3 failed attempts and reassess approach
 
 **Remember: Write code as if the person maintaining it is a violent psychopath who knows where you live. Make it that clear.**
