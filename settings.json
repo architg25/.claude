@@ -46,12 +46,12 @@
       "mcp__context7__get-library-docs"
     ]
   },
+  "enableAllProjectMcpServers": true,
   "enabledPlugins": {
     "feature-dev@claude-code-plugins": true,
     "pr-review-toolkit@claude-code-plugins": true,
     "commit-commands@claude-code-plugins": true,
     "agent-sdk-dev@claude-code-plugins": true
   },
-  "enableAllProjectMcpServers": true,
   "alwaysThinkingEnabled": true
 }

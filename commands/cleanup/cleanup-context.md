@@ -103,7 +103,7 @@ wc -c CLAUDE.md README.md
 
 **Actions:**
 
-1. Create `archive/` directory
+1. Create `docs/archive/` directory
 2. Move resolved issue documentation to archive
 3. Add archive README.md with index
 4. Update CLAUDE.md with archive reference
