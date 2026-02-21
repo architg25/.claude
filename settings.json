@@ -8,7 +8,9 @@
     "VERTEX_REGION_CLAUDE_4_6_OPUS": "global",
     "VERTEX_REGION_CLAUDE_4_5_SONNET": "global",
     "ANTHROPIC_VERTEX_PROJECT_ID": "spotify-claude-code-trial",
-    "EDITOR": "zed"
+    "EDITOR": "zed",
+    "CLAUDE_POWERLINE_THEME": "rose-pine",
+    "CLAUDE_POWERLINE_STYLE": "minimal"
   },
   "includeCoAuthoredBy": false,
   "permissions": {
@@ -73,62 +75,75 @@
   "model": "opus",
   "enableAllProjectMcpServers": true,
   "hooks": {
-    "UserPromptSubmit": [
+    "Notification": [
       {
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "node $CLAUDE_PROJECT_DIR/sessions/hooks/user_messages.js"
+            "command": "~/.claude/hooks/notify.sh 'Claude Code is waiting for your input'"
           }
         ]
       }
     ],
-    "PreToolUse": [
+    "Stop": [
       {
-        "matcher": "Task",
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "node $CLAUDE_PROJECT_DIR/sessions/hooks/subagent_hooks.js"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit|MultiEdit|Task|Bash|TodoWrite|NotebookEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node $CLAUDE_PROJECT_DIR/sessions/hooks/sessions_enforce.js"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node $CLAUDE_PROJECT_DIR/sessions/hooks/post_tool_use.js"
+            "command": "~/.claude/hooks/notify.sh 'Claude Code has stopped'"
           }
         ]
       }
     ],
     "SessionStart": [
       {
-        "matcher": "startup|clear",
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "node $CLAUDE_PROJECT_DIR/sessions/hooks/kickstart_session_start.js"
+            "command": "~/.claude/hooks/session-context.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/security-block.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'CMD=$(jq -r \".tool_input.command\" < /dev/stdin); if echo \"$CMD\" | grep -q \"git commit\"; then echo \"{\\\"additionalContext\\\": \\\"Before committing, ensure tests pass and code is formatted.\\\"}\"; fi'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/auto-format.sh"
           }
         ]
       }
     ]
   },
-  "disableAllHooks": true,
+  "disableAllHooks": false,
   "statusLine": {
     "type": "command",
-    "command": "/Users/architg/.claude/statusline-command.sh"
+    "command": "npx -y @owloops/claude-powerline@latest --style=powerline"
   },
   "enabledPlugins": {
     "feature-dev@claude-code-plugins": true,
