@@ -1,0 +1,18 @@
+version 1;
+
+// {{SCHEMA_DESCRIPTION}}
+// Owner: {{TEAM}}
+
+table {
+  partition key {
+    String {{PARTITION_KEY_NAME}} = 1;
+  }
+
+  sort key {
+    @Descending
+    Instant {{SORT_KEY_NAME}} = 2;
+  }
+
+  // Data columns
+  {{DATA_COLUMNS}}
+}

@@ -1,0 +1,11 @@
+apiVersion: runtime.spotify.com/v1alpha1
+kind: Runtime
+metadata:
+  name: {{SERVICE_NAME}}
+  namespace: {{NAMESPACE}}
+spec:
+  type: salem
+  serviceAccount: {{SERVICE_NAME}}@gke-accounts.iam.gserviceaccount.com
+  owners:
+    - {{TEAM}}@iam.spotify.com
+    - salem@iam.spotify.com

@@ -1,0 +1,46 @@
+metadata:
+  schemaVersion: 5
+components:
+  # API Gateway component
+  {{SERVICE_NAME}}-api:
+    - service_info: service-info.yaml
+      panels:
+        - template: apollo
+          type: bundle
+          override:
+            http/server/latency-p99:
+              threshold_ms: 100
+              action: pagerduty
+            http/server/error-ratio:
+              threshold_pct: 0.5
+              action: pagerduty
+
+  # Worker component
+  {{SERVICE_NAME}}-worker:
+    - service_info: service-info.yaml
+      panels:
+        - template: pubsub
+          type: bundle
+          override:
+            pubsub/subscription-backlog:
+              threshold: 10000
+              action: pagerduty
+        - template: k8s
+          type: bundle
+
+  # Shared cache metrics
+  {{SERVICE_NAME}}-cache:
+    - service_info: service-info.yaml
+      panels:
+        - template: custom
+          type: panel
+          name: cache-hit-rate
+          title: "Cache Hit Rate"
+          query: |
+            sum(rate(locus_cache_hits_total{service="{{SERVICE_NAME}}"}[5m])) /
+            sum(rate(locus_cache_requests_total{service="{{SERVICE_NAME}}"}[5m])) * 100
+          unit: percent
+          alert:
+            threshold: 90
+            operator: lt
+            action: slack

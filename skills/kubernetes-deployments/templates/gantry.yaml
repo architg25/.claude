@@ -1,0 +1,32 @@
+apiVersion: gantry.spotify.com/v1alpha1
+kind: Service
+metadata:
+  name: {{SERVICE_NAME}}
+  namespace: {{NAMESPACE}}
+spec:
+  softwareCatalogEntity: component:default/{{SERVICE_NAME}}
+  image: gcr.io/{{NAMESPACE}}/{{SERVICE_NAME}}
+  runtimeRef:
+    name: {{SERVICE_NAME}}
+
+  regions:
+    - us-central1
+    - europe-west1
+    - asia-east1
+
+  env:
+    - name: LOG_LEVEL
+      value: INFO
+
+  networking:
+    http:
+      enabled: true
+    grpc:
+      enabled: true
+    hm:
+      enabled: true
+
+  scaling:
+    resourceSizing:
+      memorySize: M
+      cpuSize: M

@@ -1,12 +1,18 @@
 {
   "env": {
     "CLAUDE_CODE_USE_VERTEX": "1",
-    "ANTHROPIC_SMALL_FAST_MODEL": "claude-3-5-haiku@20241022",
+    "model": "claude-opus-4-5@20251101",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-5@20251101",
+    "ANTHROPIC_SMALL_FAST_MODEL": "claude-4-5-haiku@20241022",
     "CLOUD_ML_REGION": "europe-west1",
     "VERTEX_REGION_CLAUDE_4_1_OPUS": "europe-west4",
     "VERTEX_REGION_CLAUDE_4_5_SONNET": "global",
-    "ANTHROPIC_VERTEX_PROJECT_ID": "spotify-claude-code-trial"
+    "ANTHROPIC_VERTEX_PROJECT_ID": "spotify-claude-code-trial",
+    "EDITOR": "zed",
+    "CLAUDE_POWERLINE_THEME": "rose-pine",
+    "CLAUDE_POWERLINE_STYLE": "minimal"
   },
+  "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
       "Bash(gh pr list:*)",
@@ -14,6 +20,8 @@
       "Bash(gh pr checks:*)",
       "Bash(gh pr diff:*)",
       "Bash(gh pr create:*)",
+      "Bash(gh pr ready:*)",
+      "Bash(gh pr review:*)",
       "Bash(git fetch:*)",
       "Bash(git checkout:*)",
       "Bash(git commit:*)",
@@ -23,13 +31,18 @@
       "Bash(git push:*)",
       "Bash(git pull:*)",
       "Bash(find:*)",
+      "Bash(awk:*)",
+      "Bash(fd:*)",
+      "Bash(cat:*)",
       "Bash(mvn:*)",
+      "Bash(spotify_player:*)",
       "Bash(mvnd:*)",
       "Bash(rg:*)",
       "Bash(grep:*)",
       "Bash(ls:*)",
       "Bash(cd:*)",
       "Bash(mkdir:*)",
+      "Bash(backstagecli:*)",
       "mcp__statements-mcp__search-catalog",
       "mcp__statements-mcp__search-get-catalog-schemas",
       "mcp__statements-mcp__spotify-get-episode",
@@ -43,15 +56,87 @@
       "mcp__aika-search__list_data_sources",
       "mcp__sequential-thinking__sequentialthinking",
       "mcp__context7__resolve-library-id",
-      "mcp__context7__get-library-docs"
+      "mcp__context7__get-library-docs",
+      "mcp__jira-cloud-server__list_tickets",
+      "mcp__jira-cloud-server__create_ticket",
+      "mcp__jira-cloud-server__edit_ticket",
+      "mcp__jira-cloud-server__get_available_transitions",
+      "mcp__jira-cloud-server__get_project_info",
+      "mcp__jira-cloud-server__search_issues_advanced",
+      "mcp__plugin_claude-mem_claude-mem-search__search_observations",
+      "mcp__plugin_claude-mem_claude-mem-search__search_sessions",
+      "mcp__plugin_claude-mem_claude-mem-search__find_by_concept",
+      "mcp__plugin_claude-mem_claude-mem-search__find_by_file",
+      "mcp__plugin_claude-mem_claude-mem-search__find_by_type",
+      "mcp__plugin_claude-mem_claude-mem-search__get_recent_context",
+      "mcp__plugin_claude-mem_claude-mem-search__search_user_prompts"
     ]
   },
   "enableAllProjectMcpServers": true,
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $CLAUDE_PROJECT_DIR/sessions/hooks/user_messages.js"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $CLAUDE_PROJECT_DIR/sessions/hooks/subagent_hooks.js"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit|Task|Bash|TodoWrite|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $CLAUDE_PROJECT_DIR/sessions/hooks/sessions_enforce.js"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $CLAUDE_PROJECT_DIR/sessions/hooks/post_tool_use.js"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $CLAUDE_PROJECT_DIR/sessions/hooks/kickstart_session_start.js"
+          }
+        ]
+      }
+    ]
+  },
+  "disableAllHooks": true,
+  "statusLine": {
+    "type": "command",
+    "command": "npx -y @owloops/claude-powerline@latest --style=powerline"
+  },
   "enabledPlugins": {
     "feature-dev@claude-code-plugins": true,
     "pr-review-toolkit@claude-code-plugins": true,
     "commit-commands@claude-code-plugins": true,
-    "agent-sdk-dev@claude-code-plugins": true
+    "agent-sdk-dev@claude-code-plugins": true,
+    "claude-mem@thedotmack": false
   },
-  "alwaysThinkingEnabled": false
+  "alwaysThinkingEnabled": true
 }

@@ -8,6 +8,7 @@
 * When something is stupid, say so
 * Stop and ask questions back if needed instead of just making code changes
 * Comments are only helpful when we need to explain the why, not the what.
+* Whenever you can, try to use agents and split tasks off to sub-agents.
 
 ### Core Beliefs
 
@@ -73,6 +74,14 @@ IMPORTANT: The below two MCPs should only be used if we need to debug an entity,
 
  - You can use statements-cli to extract information about an entity like episode, show, audiobook and audiobookChapter, use -h and my zsh history to figure out commands, again only to debug an entity not for feature development.
  - You can use statements-mcp mcp server to extract information about an entity and also are able to search through the catalogue, again only to debug an entity not for feature development.
+
+#### Jira Cloud Server MCP
+
+- If I ever ask information about a JIRA issue, assume it is for project ART.
+
+- Always hyperlink the ticket with the URL so I can go to it if need be, and show the current status next to it.
+
+- Pretty print the result as much as you can.
 
 ### 2. Planning & Task Management
 

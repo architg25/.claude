@@ -1,0 +1,20 @@
+apiVersion: caching.spotify.com/v1alpha3
+kind: Locus
+metadata:
+  name: {{SERVICE_NAME}}-locus
+  namespace: {{NAMESPACE}}
+  labels:
+    app.kubernetes.io/name: {{SERVICE_NAME}}-locus
+    app.kubernetes.io/component: cache
+spec:
+  regions:
+    - {{PRIMARY_REGION}}
+    - {{SECONDARY_REGION}}
+  numShards: {{NUM_SHARDS}}
+  podSpec:
+    cpu: {{CPU_CORES}}
+    memorySizeGb: {{MEMORY_GB}}
+  warmupEnabled: {{WARMUP_ENABLED}}
+  authEnabled: true
+  allowedAccounts:
+    - {{SERVICE_ACCOUNT}}

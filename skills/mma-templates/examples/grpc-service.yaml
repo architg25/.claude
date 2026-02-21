@@ -1,0 +1,17 @@
+metadata:
+  schemaVersion: 5
+components:
+  {{SERVICE_NAME}}:
+    - service_info: service-info.yaml
+      panels:
+        - template: grpc
+          type: bundle
+          override:
+            grpc/server/rpc-error-ratio:
+              threshold_pct: {{ERROR_THRESHOLD}}
+              action: pagerduty
+            grpc/server/latency-p99:
+              threshold_ms: {{LATENCY_THRESHOLD}}
+              action: pagerduty
+        - template: k8s
+          type: bundle

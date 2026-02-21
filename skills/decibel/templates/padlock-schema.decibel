@@ -1,0 +1,23 @@
+version 1;
+
+// {{SCHEMA_DESCRIPTION}}
+// Owner: {{TEAM}}
+// Contains PII - uses Padlock encryption
+
+table {
+  partition key {
+    String {{PARTITION_KEY_NAME}} = 1;
+  }
+
+  sort key {
+    @Descending
+    Instant {{SORT_KEY_NAME}} = 2;
+  }
+
+  // Encrypted PII fields
+  @Padlock(keyId = "{{PADLOCK_KEY_ID}}")
+  String {{ENCRYPTED_FIELD_NAME}} = 3;
+
+  // Non-PII fields
+  {{DATA_COLUMNS}}
+}
