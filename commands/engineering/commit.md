@@ -27,7 +27,6 @@ You are tasked with creating git commits for the changes made during this sessio
    - Show the result with `git log --oneline -n [number]`
 
 ## Important:
-- **Ensure that we attribute AI (e.g. Claude) with the commit**
 - Write commit messages as if the user wrote them
 
 ## Remember:
