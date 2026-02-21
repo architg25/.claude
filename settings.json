@@ -4,8 +4,8 @@
     "model": "claude-opus-4-6",
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-6",
     "ANTHROPIC_SMALL_FAST_MODEL": "claude-4-5-haiku@20241022",
-    "CLOUD_ML_REGION": "europe-west4",
-    "VERTEX_REGION_CLAUDE_4_5_OPUS": "europe-west4",
+    "CLOUD_ML_REGION": "global",
+    "VERTEX_REGION_CLAUDE_4_6_OPUS": "global",
     "VERTEX_REGION_CLAUDE_4_5_SONNET": "global",
     "ANTHROPIC_VERTEX_PROJECT_ID": "spotify-claude-code-trial",
     "EDITOR": "zed"
