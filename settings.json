@@ -75,28 +75,6 @@
   "model": "opus",
   "enableAllProjectMcpServers": true,
   "hooks": {
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/notify.sh 'Claude Code is waiting for your input'"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/notify.sh 'Claude Code has stopped'"
-          }
-        ]
-      }
-    ],
     "SessionStart": [
       {
         "matcher": "",
