@@ -1,0 +1,35 @@
+# Ignore everything by default
+*
+
+# Allow the specific directories we want to track
+!skills/
+!agents/
+!commands/
+
+# Allow all files within those directories
+!skills/**
+!agents/**
+!commands/**
+
+# Allow script files
+!*.sh
+
+# Allow hooks directory
+!hooks/
+!hooks/**
+
+# Allow settings
+!settings.json
+
+# Allow .gitignore itself
+!.gitignore
+
+# Allow README
+!README.md
+
+# Allow CLAUDE.md
+!CLAUDE.md
+
+# Exclude Python cache directories
+__pycache__/
+*.pyc
