@@ -9,8 +9,7 @@
     "VERTEX_REGION_CLAUDE_4_5_SONNET": "global",
     "ANTHROPIC_VERTEX_PROJECT_ID": "spotify-claude-code-trial",
     "EDITOR": "zed",
-    "CLAUDE_POWERLINE_THEME": "rose-pine",
-    "CLAUDE_POWERLINE_STYLE": "minimal"
+    "CLAUDE_POWERLINE_CONFIG": "~/.claude/minimal-config.json"
   },
   "includeCoAuthoredBy": false,
   "permissions": {
