@@ -30,6 +30,11 @@
 
 Use MCP tools when they're actually needed, not speculatively:
 
+#### Skills vs MCP Tools
+- **IMPORTANT**: When a user request could be handled by either a skill (in `~/.claude/skills/`) or an MCP tool, ALWAYS check for and prefer using skills first. Skills are custom, well-documented approaches specifically designed for common tasks at Spotify.
+- Before using MCP tools for complex tasks, check if there's a relevant skill file that provides better instructions or approaches.
+- Skills are documentation/instructions to read and follow, not commands to invoke.
+
 **Use aika-search when:**
 - Debugging Spotify internals without clear codebase pointers
 - Finding documentation or Slack discussions about systems/decisions
@@ -75,13 +80,25 @@ IMPORTANT: The below two MCPs should only be used if we need to debug an entity,
  - You can use statements-cli to extract information about an entity like episode, show, audiobook and audiobookChapter, use -h and my zsh history to figure out commands, again only to debug an entity not for feature development.
  - You can use statements-mcp mcp server to extract information about an entity and also are able to search through the catalogue, again only to debug an entity not for feature development.
 
-#### Jira Cloud Server MCP
+#### Atlassian Server MCP
 
-- If I ever ask information about a JIRA issue, assume it is for project ART.
+- If I ever ask information about a JIRA issue, assume it is for project CONACCESS.
 
 - Always hyperlink the ticket with the URL so I can go to it if need be, and show the current status next to it.
 
 - Pretty print the result as much as you can.
+
+#### Backstage TechDocs URL Handling
+
+When a user pastes a Backstage techdocs URL (`https://backstage.spotify.net/docs/...`):
+
+1. **Extract component name** from URL path (last segment)
+2. **Find source repo**: `mcp__code-search-mcp__search_code('"name: <component>" f:catalog-info.yaml')`
+3. **Read docs**: `mcp__code-search-mcp__read_file("docs/index.md", "<repo>")`
+
+Fallback: If Code Search fails, try `mcp__aika-search-mcp__spotify_internal_search(query="<component>", data_source="techdocs")`.
+
+For full instructions, see the `backstage-techdocs` skill.
 
 ### 2. Planning & Task Management
 
