@@ -8,9 +8,7 @@
     "VERTEX_REGION_CLAUDE_4_1_OPUS": "europe-west4",
     "VERTEX_REGION_CLAUDE_4_5_SONNET": "global",
     "ANTHROPIC_VERTEX_PROJECT_ID": "spotify-claude-code-trial",
-    "EDITOR": "zed",
-    "CLAUDE_POWERLINE_THEME": "rose-pine",
-    "CLAUDE_POWERLINE_STYLE": "minimal"
+    "EDITOR": "zed"
   },
   "includeCoAuthoredBy": false,
   "permissions": {
@@ -127,10 +125,6 @@
     ]
   },
   "disableAllHooks": true,
-  "statusLine": {
-    "type": "command",
-    "command": "npx -y @owloops/claude-powerline@latest --style=powerline"
-  },
   "enabledPlugins": {
     "feature-dev@claude-code-plugins": true,
     "pr-review-toolkit@claude-code-plugins": true,
