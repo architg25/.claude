@@ -28,9 +28,9 @@
             "enabled": true
           },
           "session": {
-            "enabled": true,
+            "enabled": false,
             "type": "tokens",
-            "costSource": "official"
+            "costSource": "calculated"
           },
           "context": {
             "enabled": true,

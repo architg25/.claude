@@ -1,0 +1,39 @@
+# Jira Epic Summary Template
+
+Use this template to format the Phase 3 synthesis into a Jira-ready description.
+
+```markdown
+## Overview
+
+{1-3 sentence summary of what this epic is about and why it exists}
+
+## Context
+
+This epic falls under the [{initiative_title}]({groove_initiative_url}) initiative ({initiative_status}, owned by {initiative_owner}) and the [{dod_title}]({groove_dod_url}) Definition of Done ({dod_status}, {dod_priority} priority, owned by {dod_owner}).
+
+{1-2 sentence summary of what the DoD requires and how this epic fits into it}
+
+## What Vogons Needs to Deliver
+
+{Bulleted list of concrete deliverables/responsibilities for Vogons, synthesized from all sources}
+
+- Deliverable 1
+- Deliverable 2
+- ...
+
+## Dependencies & Risks
+
+{Only include if there are actual risks or cross-team dependencies}
+
+- {risk/dependency description}
+
+## References
+
+- [DoD Doc]({google_doc_url_1})
+- [Initiative Doc]({google_doc_url_2})
+- {any other relevant links from Groove remoteLinks or externalLinks}
+
+---
+
+_Auto-generated from Groove, Jira, and linked docs by vogons-epic-context_
+```

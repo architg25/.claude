@@ -1,12 +1,6 @@
 {
   "env": {
     "model": "claude-opus-4-6[1m]",
-    "CLAUDE_CODE_USE_VERTEX": "1",
-    "CLOUD_ML_REGION": "global",
-    "VERTEX_REGION_CLAUDE_4_0_OPUS": "global",
-    "VERTEX_REGION_CLAUDE_4_6_OPUS": "global",
-    "VERTEX_REGION_CLAUDE_4_5_SONNET": "global",
-    "ANTHROPIC_VERTEX_PROJECT_ID": "spotify-claude-code-trial",
     "EDITOR": "zed",
     "CLAUDE_POWERLINE_CONFIG": "~/.claude/minimal-config.json"
   },
@@ -32,6 +26,7 @@
       "Bash(awk:*)",
       "Bash(fd:*)",
       "Bash(cat:*)",
+      "Bash(head:*)",
       "Bash(mvn:*)",
       "Bash(mvnd:*)",
       "Bash(rg:*)",
@@ -78,6 +73,7 @@
       "mcp__honk-coding-agent-mcp-experimental__*"
     ]
   },
+  "model": "claude-opus-4-6[1m]",
   "enableAllProjectMcpServers": true,
   "hooks": {
     "SessionStart": [
