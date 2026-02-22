@@ -1,8 +1,7 @@
 {
   "env": {
     "model": "claude-opus-4-6[1m]",
-    "EDITOR": "zed",
-    "CLAUDE_POWERLINE_CONFIG": "~/.claude/minimal-config.json"
+    "EDITOR": "zed"
   },
   "includeCoAuthoredBy": false,
   "permissions": {

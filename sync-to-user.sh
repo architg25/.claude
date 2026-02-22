@@ -1,71 +1,45 @@
 #!/bin/bash
 
-# Script to sync agents, commands, skills, hooks, and config to ~/.claude folder
-# Assumes the directories already exist
+# Sync repo contents to ~/.claude
+# Creates target directories if missing.
 
-# Get the directory where the script is located
+set -euo pipefail
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-# Target directory
 CLAUDE_DIR="$HOME/.claude"
 
-echo "Claude Code Setup Sync"
-echo "======================"
-echo ""
-
-# Check if ~/.claude directory exists
 if [ ! -d "$CLAUDE_DIR" ]; then
-    echo "Error: ~/.claude directory does not exist."
-    echo "Please run apply-to-user.sh first or create the directory."
+    echo "Error: ~/.claude does not exist." >&2
     exit 1
 fi
 
-# Function to sync directory
 sync_dir() {
-    local source_dir="$1"
-    local target_dir="$2"
-    local dir_name="$3"
-
-    if [ -d "$source_dir" ]; then
-        if [ ! -d "$target_dir" ]; then
-            echo "Error: $target_dir does not exist."
-            echo "Please run apply-to-user.sh first."
-            exit 1
-        fi
-
-        echo "Syncing $dir_name..."
-        rsync -av --delete "$source_dir/" "$target_dir/"
-        echo "  ✓ $dir_name synced successfully"
-    else
-        echo "Warning: $source_dir not found, skipping..."
-    fi
+    local src="$SCRIPT_DIR/$1"
+    [ ! -d "$src" ] && return
+    mkdir -p "$CLAUDE_DIR/$1"
+    rsync -a --delete "$src/" "$CLAUDE_DIR/$1/"
+    echo "  $1/"
 }
 
-# Function to sync a single file
 sync_file() {
-    local source_file="$1"
-    local target_file="$2"
-    local file_name="$3"
-
-    if [ -f "$source_file" ]; then
-        echo "Syncing $file_name..."
-        cp "$source_file" "$target_file"
-        echo "  ✓ $file_name synced successfully"
-    else
-        echo "Warning: $source_file not found, skipping..."
-    fi
+    local src="$SCRIPT_DIR/$1"
+    [ ! -f "$src" ] && return
+    cp "$src" "$CLAUDE_DIR/$1"
+    echo "  $1"
 }
 
-# Sync directories
-sync_dir "$SCRIPT_DIR/agents" "$CLAUDE_DIR/agents" "agents"
-sync_dir "$SCRIPT_DIR/commands" "$CLAUDE_DIR/commands" "commands"
-sync_dir "$SCRIPT_DIR/skills" "$CLAUDE_DIR/skills" "skills"
-sync_dir "$SCRIPT_DIR/hooks" "$CLAUDE_DIR/hooks" "hooks"
+echo "Syncing to $CLAUDE_DIR:"
 
-# Sync individual files
-sync_file "$SCRIPT_DIR/settings.json" "$CLAUDE_DIR/settings.json" "settings.json"
-sync_file "$SCRIPT_DIR/statusline.sh" "$CLAUDE_DIR/statusline.sh" "statusline.sh"
+sync_dir agents
+sync_dir commands
+sync_dir hooks
+sync_dir skills
+sync_dir ccline
 
-echo ""
-echo "Sync complete!"
-echo ""
+sync_file CLAUDE.md
+sync_file README.md
+sync_file settings.json
+sync_file minimal-config.json
+sync_file powerline-config.json
+
+echo "Done."
