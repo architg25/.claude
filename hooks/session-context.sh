@@ -28,8 +28,8 @@ if [ -f TODO.md ]; then
     head -20 TODO.md
 fi
 
-# Check for thoughts/jbrooksbartlett/tickets with recent files
-TICKETS_DIR="$HOME/.claude/thoughts/jbrooksbartlett/tickets"
+# Check for thoughts/architg/tickets with recent files
+TICKETS_DIR="$HOME/.claude/thoughts/architg/tickets"
 if [ -d "$TICKETS_DIR" ]; then
     RECENT_TICKETS=$(find "$TICKETS_DIR" -name "*.md" -mtime -7 2>/dev/null | head -3)
     if [ -n "$RECENT_TICKETS" ]; then
