@@ -122,7 +122,8 @@
   "disableAllHooks": false,
   "statusLine": {
     "type": "command",
-    "command": "npx -y @owloops/claude-powerline@latest --style=powerline"
+    "command": "~/.claude/ccline/ccline",
+    "padding": 0
   },
   "enabledPlugins": {
     "feature-dev@claude-code-plugins": false,
