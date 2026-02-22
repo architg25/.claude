@@ -1,10 +1,9 @@
 {
   "env": {
+    "model": "claude-opus-4-6[1m]",
     "CLAUDE_CODE_USE_VERTEX": "1",
-    "model": "claude-opus-4-6",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-6",
-    "ANTHROPIC_SMALL_FAST_MODEL": "claude-4-5-haiku@20241022",
     "CLOUD_ML_REGION": "global",
+    "VERTEX_REGION_CLAUDE_4_0_OPUS": "global",
     "VERTEX_REGION_CLAUDE_4_6_OPUS": "global",
     "VERTEX_REGION_CLAUDE_4_5_SONNET": "global",
     "ANTHROPIC_VERTEX_PROJECT_ID": "spotify-claude-code-trial",
@@ -63,7 +62,12 @@
       "mcp__atlassian-mcp__get_project_info",
       "mcp__atlassian-mcp__search_issues_advanced",
       "mcp__atlassian-mcp__get_available_transitions",
-      "mcp__bigquery-mcp__*"
+      "mcp__bigquery-mcp__*",
+      "mcp__groove-mcp__*",
+      "mcp__google-drive-mcp__*"
+    ],
+    "deny": [
+      "Bash(bazel clean:*)"
     ],
     "ask": [
       "Bash(spt git:sparse:*)",
@@ -72,12 +76,8 @@
       "mcp__atlassian-mcp__create_ticket_advanced",
       "mcp__atlassian-mcp__edit_ticket",
       "mcp__honk-coding-agent-mcp-experimental__*"
-    ],
-    "deny": [
-      "Bash(bazel clean:*)"
     ]
   },
-  "model": "opus",
   "enableAllProjectMcpServers": true,
   "hooks": {
     "SessionStart": [
