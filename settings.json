@@ -34,7 +34,6 @@
       "Bash(fd:*)",
       "Bash(cat:*)",
       "Bash(mvn:*)",
-      "Bash(spotify_player:*)",
       "Bash(mvnd:*)",
       "Bash(rg:*)",
       "Bash(grep:*)",

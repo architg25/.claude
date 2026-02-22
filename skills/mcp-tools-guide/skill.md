@@ -11,6 +11,7 @@ Use MCP tools when they're actually needed, not speculatively.
 
 ## Aika Search
 
+
 **Use aika-search when:**
 - Debugging Spotify internals without clear codebase pointers
 - Finding documentation or Slack discussions about systems/decisions
