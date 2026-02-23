@@ -65,13 +65,25 @@ Use `edit_ticket` with:
 }
 ```
 
-### Link (inline card — renders as smart Jira link)
+### Hyperlink
+
+```json
+{
+  "type": "text",
+  "text": "link text",
+  "marks": [{ "type": "link", "attrs": { "href": "https://example.com" } }]
+}
+```
+
+Place inside a paragraph's content array alongside other text nodes.
+
+### Inline card (smart link — use sparingly)
 
 ```json
 { "type": "inlineCard", "attrs": { "url": "https://example.com" } }
 ```
 
-Place inside a paragraph's content array alongside text nodes.
+Renders as a resolved card chip. Prefer hyperlinks for most cases.
 
 ### Italic text
 
@@ -104,8 +116,8 @@ When converting the epic summary to ADF:
 1. Each `## Heading` becomes a heading node with level 2
 2. Each paragraph of text becomes a paragraph node
 3. Each `- item` becomes a listItem inside a bulletList
-4. Each `[text](url)` becomes an inlineCard inside a paragraph
+4. Each `[text](url)` becomes a text node with a link mark
 5. The disclaimer becomes italic text in a paragraph after a rule
 6. Multiple consecutive bullet items go into ONE bulletList node
-7. Any Jira key mentioned in text (e.g. CONACCESS-18) becomes an inlineCard
-   with url `https://jira.spotify.net/browse/{KEY}` — do NOT leave Jira keys as plain text
+7. Any Jira key mentioned in text (e.g. CONACCESS-18) becomes a hyperlink
+   text node with href `https://jira.spotify.net/browse/{KEY}` — do NOT leave Jira keys as plain text

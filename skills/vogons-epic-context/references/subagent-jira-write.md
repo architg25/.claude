@@ -19,7 +19,7 @@ node reference. Key rules:
 - Each bullet point → listItem in a bulletList
 - Each link [text](url) → paragraph containing an inlineCard node
 - The disclaimer → rule node, then paragraph with italic text
-- Any Jira key (e.g. CONACCESS-18) → inlineCard with url https://jira.spotify.net/browse/{KEY}
+- Any Jira key (e.g. CONACCESS-18) → hyperlink text node with href https://jira.spotify.net/browse/{KEY}
 
 Step 5: Use mcp**atlassian-mcp**edit_ticket with:
 
