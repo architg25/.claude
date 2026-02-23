@@ -107,3 +107,5 @@ When converting the epic summary to ADF:
 4. Each `[text](url)` becomes an inlineCard inside a paragraph
 5. The disclaimer becomes italic text in a paragraph after a rule
 6. Multiple consecutive bullet items go into ONE bulletList node
+7. Any Jira key mentioned in text (e.g. CONACCESS-18) becomes an inlineCard
+   with url `https://jira.spotify.net/browse/{KEY}` — do NOT leave Jira keys as plain text
