@@ -49,8 +49,7 @@ Patterns for Remote Configuration Service property definition and resolution at 
 
 ## Related Skills
 
-- [experimentation-patterns](../experimentation-patterns/SKILL.md) - Experiment setup using RCS properties
-- [exposure-filtering](../exposure-filtering/SKILL.md) - Custom exposure for RCS-based experiments
+- [experimentation-patterns](../experimentation-patterns/SKILL.md) - Experiment setup, exposure filtering, and RCS property targeting
 
 ## Support Channels
 

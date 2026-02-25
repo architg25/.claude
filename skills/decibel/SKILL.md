@@ -59,8 +59,6 @@ DecibelModule.create(YourDatabase.Connection.class)
 
 ## Related Skills
 
-- [data-annotation](../data-annotation/SKILL.md) - GDPR annotations for Decibel output schemas
-- [scio-patterns](../scio-patterns/SKILL.md) - Pipeline patterns when using DecibelIO
 - [locus-caching](../locus-caching/SKILL.md) - Caching layer in front of Decibel
 - [apollo-configuration](../apollo-configuration/SKILL.md) - HOCON patterns for database connection configuration
 

@@ -5,6 +5,7 @@ You are tasked with conducting comprehensive research across the codebase and be
 ## Core Principle: Document and Explain What Exists
 
 Your role is to document and explain the codebase as it currently exists:
+
 - Describe what exists, where it exists, how it works, and how components interact
 - Focus on creating a technical map/documentation of the existing system
 - Suggest improvements, root cause analysis, or enhancements only when the user explicitly requests them
@@ -13,6 +14,7 @@ Your role is to document and explain the codebase as it currently exists:
 ## Initial Setup:
 
 When this command is invoked, respond with:
+
 ```
 I'm ready to research the problem. Please provide your research question or area of interest, and I'll analyze it thoroughly by exploring relevant components and connections.
 ```
@@ -32,6 +34,7 @@ Then wait for the user's research query.
    - **Consider the research problem carefully from multiple angles**
    - **Write out all specific questions in your response text for the user to see**
    - Format the questions clearly in the terminal output:
+
      ```
      ## Research Questions
 
@@ -42,9 +45,11 @@ Then wait for the user's research query.
      3. [Question 3] → Will use [subagent-type]
      ...
      ```
+
    - **List assumptions being made:**
      - After listing questions, identify and document assumptions about the research problem
      - Format assumptions clearly in the terminal output:
+
      ```
      ## Assumptions
 
@@ -64,9 +69,11 @@ Then wait for the user's research query.
      1. [Time/scope constraints, e.g., "Research should complete in one session"]
      2. [Access constraints, e.g., "All relevant code is in this repository"]
      ```
+
    - **Define success criteria:**
      - After listing assumptions, define what would constitute a complete answer
      - Format success criteria clearly in the terminal output:
+
      ```
      ## Success Criteria
 
@@ -75,9 +82,11 @@ Then wait for the user's research query.
      - [ ] [Level of detail required, e.g., "Each component's role in the flow is documented"]
      - [ ] [Scope of coverage, e.g., "Both happy path and error handling are covered"]
      ```
+
    - **Define explicit scope boundaries:**
      - After success criteria, clearly state what is OUT of scope
      - Format scope boundaries clearly in the terminal output:
+
      ```
      ## Scope
 
@@ -90,10 +99,12 @@ Then wait for the user's research query.
      - [Systems to exclude, e.g., "Shared libraries outside this repository"]
      - [Depth limits, e.g., "Will not deep-dive into database schemas"]
      ```
+
    - **Identify known starting points and prior knowledge:**
      - Extract any files, components, or systems mentioned in the user's question
      - Note what the user appears to already understand
      - Format in the terminal output:
+
      ```
      ## Research Context
 
@@ -109,6 +120,7 @@ Then wait for the user's research query.
      - [Link to existing research docs if found in ~/.claude/thoughts/shared/research/]
      - [Or: "No prior research found on this topic"]
      ```
+
    - **Analyze question dependencies and create an execution plan:**
      - After identifying all questions, evaluate how they relate to each other
      - For each question, consider:
@@ -121,6 +133,7 @@ Then wait for the user's research query.
        - **Architecture understanding**: Understanding system structure first may make component questions more targeted
        - **Existence validation**: Confirming something exists before researching how it works
      - Create a dependency analysis and execution plan:
+
      ```
      ## Research Execution Plan
 
@@ -136,11 +149,13 @@ Then wait for the user's research query.
      **Execution Batches:**
 
      ```
+
      Batch 1 (parallel): Q1, Q3
-        ↓ (wait for completion, extract key context)
+     ↓ (wait for completion, extract key context)
      Batch 2 (parallel): Q2 (informed by Q1 findings)
-        ↓ (wait for completion)
+     ↓ (wait for completion)
      Batch 3: Q4 (informed by Q2 + Q3 findings)
+
      ```
 
      **Context to pass between batches:**
@@ -183,6 +198,7 @@ Then wait for the user's research query.
        - Validation iteration 2 (pending → in_progress → completed)
        ```
    - **After listing all sections above, ask the user for confirmation:**
+
      ```
      Do these look correct?
      - Questions to investigate
@@ -194,47 +210,20 @@ Then wait for the user's research query.
 
      Should I adjust the questions, sequencing, or any other aspect before proceeding?
      ```
+
    - **Wait for the user to confirm before proceeding to Step 3.** Do not continue until the user explicitly approves or provides adjustments.
 
    **Required: Agent Type Accounting**
-   - At the end of Step 2, after listing all sections (questions, assumptions, success criteria, scope, context), create an accountability list:
-   ```
-   ## Agent Type Verification
 
-   Based on the questions above, I will spawn the following agent types:
-   - codebase-locator (questions 1, 3)
-   - codebase-analyzer (questions 1, 3) - will spawn in Batch 2 after locators complete
-   - spotify-tool-researcher (question 2)
-   - codebase-pattern-finder (question 4)
+   @commands/shared/agent-verification-pattern.md
 
-   Total unique agent types: 4
-   ```
-   - **This list becomes your contract**: all agent types listed here should be spawned before synthesis
-   - If you skip any agent type, you are breaking the contract and the research will be incomplete
+   Create the agent contract listing all agent types needed for the research questions above. This list becomes your contract -- all agent types listed must be spawned before synthesis.
 
 3. **Spawn sub-agent tasks according to the execution plan:**
 
    **REQUIRED: Pre-Spawn Verification Table**
 
-   Before making ANY Task tool calls, you MUST output a verification table that cross-checks your planned agent types against what you're about to spawn. This prevents agent type substitution errors.
-
-   ```
-   ## Pre-Spawn Verification (Batch N)
-
-   Cross-checking Agent Type Verification from Step 2 against Task tool calls I'm about to make:
-
-   | Question | Planned Agent (Step 2) | Agent I Will Spawn | Match? |
-   |----------|------------------------|-------------------|--------|
-   | Q1       | spotify-tool-researcher | spotify-tool-researcher | ✓ |
-   | Q2       | codebase-locator       | codebase-locator  | ✓ |
-   | ...      | ...                    | ...               | ... |
-
-   **All rows show ✓? Proceed with spawning.**
-   **Any row shows ✗? STOP. Correct the agent type before spawning.**
-   ```
-
-   **CRITICAL**: When writing the `subagent_type` parameter in Task tool calls, COPY the exact agent type string from your Agent Type Verification list in Step 2. Do NOT type it from memory.
-
+   @commands/shared/pre-spawn-verification.md
    - **Execute batches in sequence, with parallel spawning within each batch**
    - Follow the execution plan from Step 2, spawning agents batch by batch
    - **For each batch in the execution plan:**
@@ -246,6 +235,7 @@ Then wait for the user's research query.
 
    - **Passing context between batches:**
      - When spawning agents in Batch N+1, include a "Prior Findings" section in their prompts:
+
        ```
        ## Prior Findings (from earlier research phases)
 
@@ -266,51 +256,19 @@ Then wait for the user's research query.
        Example: "Combining questions 1 & 2 into external-repo-explorer since both involve search-api video detection"
    - **Default subagent choice: spotify-tool-researcher** (since we work at Spotify, most questions involve Spotify-specific context)
    - Create multiple Task agents to research different aspects concurrently
-   - Select the most appropriate agent type for each question based on these specialized agents:
+   - Select the most appropriate agent type for each question:
 
-   **For codebase research (Sequential, NOT parallel):**
-   - **Spawn codebase-locator first, then codebase-analyzer after locator completes**
-   - **BATCH 1 Pattern**: Spawn all non-codebase agents in parallel FIRST, along with codebase-locator agents
-     - spotify-tool-researcher agents
-     - web-search-researcher agents
-     - codebase-locator agents (to find WHERE files are)
-     - thoughts-locator agents
-   - **BATCH 2 Pattern** (handled in step 4): After Batch 1 completes, spawn codebase-analyzer agents
-     - codebase-analyzer agents (to understand HOW code works)
-     - codebase-pattern-finder agents (to find usage examples)
-     - thoughts-analyzer agents
-   - **Reasoning**: Locator must find files before analyzer can explain them. This is a sequential dependency, not parallel work.
-   - Update TODO list: Mark Batch 1 agent tasks as "in_progress" when spawning
-
-  **For thoughts directory:**
-   - Use the **thoughts-locator** agent to discover what documents exist about the topic
-   - Use the **thoughts-analyzer** agent to extract key insights from specific documents (only the most relevant ones)
-   - If the **thoughts** directory doesn't exist at `~/.claude/thoughts`, create it.
+   @commands/shared/subagent-types.md
 
    **IMPORTANT**: All agents are documentarians, not critics. They will describe what exists without suggesting improvements or identifying issues.
-
-   **For external (outside the codebase) research (e.g. Spotify documentation, Slack, web search):**
-   - Use the **spotify-tool-researcher** agent for
-     - spotify recommended/approved tools/libraries mentioned
-     - there are relevant Slack discussions
-     - there are any Google Docs/Google Slides/Google Sheets etc. linked
-   - Use the **web-search-researcher** agent for external documentation and resources to compliment the results found with the **spotify-tool-researcher** or if there is no existing Spotify tool/solution
    - When using the **spotify-tool-researcher** or **web-search-researcher** agents, instruct them to return LINKS with their findings, and please INCLUDE those links in your final report
+   - If the **thoughts** directory doesn't exist at `~/.claude/thoughts`, create it.
 
    **For domain-specific research:**
 
    If the research question involves specific technical domains, consider spawning domain experts:
 
-   | Domain Pattern | Expert Agent | When to Use |
-   |---------------|--------------|-------------|
-   | Flyte, Liftoff, workflow orchestration | flyte-liftoff-expert | Workflow and pipeline orchestration questions |
-   | Luigi, Styx, ice-luigi | luigi-workflow-expert | Luigi-based workflow questions |
-   | Scio, SCollection, Beam pipelines | scio-pipeline-optimization-analyzer | Data pipeline patterns and optimization |
-   | Hendrix, Ray, ML training | hendrix-expert | ML platform and training questions |
-   | Vespa, search indexing, YQL | search-indexing-expert | Search infrastructure questions |
-   | Decibel, Locus, caching | backend-infrastructure-expert | Backend infrastructure questions |
-   | RCS, experiments, feature flags | experimentation-expert | Experimentation platform questions |
-   | Salem, ML serving, Fonzie | java-ml-serving-expert | ML serving integration questions |
+   @commands/shared/domain-agent-registry.md
 
    Domain experts provide specialized knowledge that general agents may lack. Spawn them when:
    - The research question explicitly mentions domain technologies
@@ -338,15 +296,16 @@ Then wait for the user's research query.
 
    **Dependency Analysis:**
 
-   | Question | Depends On | Rationale |
-   |----------|------------|-----------|
-   | Q1 | None | Need to know what bots exist before understanding their configs |
-   | Q2 | None | General Spotify context, independent |
-   | Q3 | Q1 | Knowing which bots exist (Q1) tells us what config files to look for |
-   | Q4 | Q1, Q3 | Need to know our bot (Q1) and our config (Q3) to find similar patterns |
-   | Q5 | Q1 | Knowing which bot we use (Q1) focuses external research |
+   | Question | Depends On | Rationale                                                              |
+   | -------- | ---------- | ---------------------------------------------------------------------- |
+   | Q1       | None       | Need to know what bots exist before understanding their configs        |
+   | Q2       | None       | General Spotify context, independent                                   |
+   | Q3       | Q1         | Knowing which bots exist (Q1) tells us what config files to look for   |
+   | Q4       | Q1, Q3     | Need to know our bot (Q1) and our config (Q3) to find similar patterns |
+   | Q5       | Q1         | Knowing which bot we use (Q1) focuses external research                |
 
    **Execution Batches:**
+
    ```
    Batch 1 (parallel): Q1, Q2
       ↓ Q1 reveals: "We use Renovate"
@@ -435,24 +394,7 @@ Then wait for the user's research query.
 
    **Pre-synthesis verification:**
 
-   ```
-   ## Pre-Synthesis Agent Verification
-
-   Checking that all committed agent types have been spawned:
-
-   From Step 2 Agent Type Verification:
-   - Agent types committed: [List from Step 2]
-   - Total: X agent types
-
-   Agents actually spawned:
-   - [List all agent types actually spawned across Batch 1 + Batch 2]
-   - Total: Y agent types
-
-   ✓ Verification: X = Y? [YES/NO]
-
-   If NO: STOP. Return to Step 3 and spawn missing agent types.
-   If YES: Proceed with synthesis.
-   ```
+   Run Phase 3 from `commands/shared/agent-verification-pattern.md` to verify all contracted agents were spawned before proceeding.
 
    **BLOCKER RULES:**
    - Count: Agent types mentioned in Step 2 = Agent types actually spawned
@@ -481,6 +423,7 @@ Then wait for the user's research query.
    - Review the questions identified in step 2 against the synthesized findings from step 5
 
    **Output this section for the user to see:**
+
    ```
    ## Research Completeness Review (Iteration N of 2)
 
@@ -541,33 +484,35 @@ Then wait for the user's research query.
 
 7. **Gather metadata for the research document:**
    - Run the following script to generate metadata:
-        ```bash
-        #!/usr/bin/env bash
-        set -euo pipefail
 
-        # Collect metadata
-        DATETIME_TZ=$(date '+%Y-%m-%d %H:%M:%S %Z')
-        FILENAME_TS=$(date '+%Y-%m-%d_%H-%M-%S')
+     ```bash
+     #!/usr/bin/env bash
+     set -euo pipefail
 
-        if command -v git >/dev/null 2>&1 && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-        REPO_ROOT=$(git rev-parse --show-toplevel)
-        REPO_NAME=$(basename "$REPO_ROOT")
-        GIT_BRANCH=$(git branch --show-current 2>/dev/null || git rev-parse --abbrev-ref HEAD)
-        GIT_COMMIT=$(git rev-parse HEAD)
-        else
-        REPO_ROOT=""
-        REPO_NAME=""
-        GIT_BRANCH=""
-        GIT_COMMIT=""
-        fi
+     # Collect metadata
+     DATETIME_TZ=$(date '+%Y-%m-%d %H:%M:%S %Z')
+     FILENAME_TS=$(date '+%Y-%m-%d_%H-%M-%S')
 
-        # Print similar to the individual command outputs
-        echo "Current Date/Time (TZ): $DATETIME_TZ"
-        [ -n "$GIT_COMMIT" ] && echo "Current Git Commit Hash: $GIT_COMMIT"
-        [ -n "$GIT_BRANCH" ] && echo "Current Branch Name: $GIT_BRANCH"
-        [ -n "$REPO_NAME" ] && echo "Repository Name: $REPO_NAME"
-        echo "Timestamp For Filename: $FILENAME_TS"
-        ```
+     if command -v git >/dev/null 2>&1 && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+     REPO_ROOT=$(git rev-parse --show-toplevel)
+     REPO_NAME=$(basename "$REPO_ROOT")
+     GIT_BRANCH=$(git branch --show-current 2>/dev/null || git rev-parse --abbrev-ref HEAD)
+     GIT_COMMIT=$(git rev-parse HEAD)
+     else
+     REPO_ROOT=""
+     REPO_NAME=""
+     GIT_BRANCH=""
+     GIT_COMMIT=""
+     fi
+
+     # Print similar to the individual command outputs
+     echo "Current Date/Time (TZ): $DATETIME_TZ"
+     [ -n "$GIT_COMMIT" ] && echo "Current Git Commit Hash: $GIT_COMMIT"
+     [ -n "$GIT_BRANCH" ] && echo "Current Branch Name: $GIT_BRANCH"
+     [ -n "$REPO_NAME" ] && echo "Repository Name: $REPO_NAME"
+     echo "Timestamp For Filename: $FILENAME_TS"
+     ```
+
    - Create the `~/.claude/thoughts/shared/research/` directory if it doesn't exist
    - Filename: `~/.claude/thoughts/shared/research/YYYY-MM-DD-ENG-XXXX-description.md`
      - Format: `YYYY-MM-DD-ENG-XXXX-description.md` where:
@@ -580,63 +525,9 @@ Then wait for the user's research query.
 
 8. **Generate research document:**
    - Use the metadata gathered in step 7
-   - Structure the document with YAML frontmatter followed by content:
-     ```markdown
-     ---
-     date: [Current date and time with timezone in ISO format]
-     researcher: [Researcher name from thoughts status]
-     git_commit: [Current commit hash]
-     branch: [Current branch name]
-     repository: [Repository name]
-     topic: "[User's Question/Topic]"
-     tags: [research, codebase, tools, libraries, relevant-component-names]
-     status: complete
-     last_updated: [Current date in YYYY-MM-DD format]
-     last_updated_by: [Researcher name]
-     ---
+   - Structure the document with YAML frontmatter followed by content sections, using the research report template:
 
-     # Research: [User's Question/Topic]
-
-     **Date**: [Current date and time with timezone from step 7]
-     **Researcher**: [Researcher name from thoughts status]
-     **Git Commit**: [Current commit hash from step 7]
-     **Branch**: [Current branch name from step 7]
-     **Repository**: [Repository name]
-
-     ## Research Question
-     [Original user query]
-
-     ## Summary
-     [High-level documentation of what was found, answering the user's question by describing what exists]
-
-     ## Detailed Findings
-
-     ### [Component/Area 1]
-     - Description of what exists ([file.ext:line](link))
-     - How it connects to other components
-     - Current implementation details (without evaluation)
-
-     ### [Component/Area 2]
-     ...
-
-     ## Code References
-     - `path/to/file.py:123` - Description of what's there
-     - `another/file.ts:45-67` - Description of the code block
-
-     ## Architecture Documentation
-     [Current patterns, conventions, and design implementations found in the codebase]
-
-     ## Historical Context (from ~/.claude/thoughts/)
-     [Relevant insights from ~/.claude/thoughts/ directory with references]
-     - `~/.claude/thoughts/shared/something.md` - Historical decision about X
-     - `~/.claude/thoughts/local/notes.md` - Past exploration of Y
-
-     ## Related Research
-     [Links to other research documents in ~/.claude/thoughts/shared/research/]
-
-     ## Open Questions
-     [Any areas that need further investigation]
-     ```
+     @commands/shared/research-report-template.md
 
 9. **Add GitHub permalinks (if applicable):**
    - Check if on main branch or if commit is pushed: `git branch --show-current` and `git status`
@@ -646,31 +537,35 @@ Then wait for the user's research query.
    - Replace local file references with permalinks in the document
 
 10. **Include mcp calls so the findings can be reproduced**
-   - The output of the spotify tool researcher may contain information from Spotify sources via mcp calls
-   - Include the relevant information from the **Additional Resources**:
-     - query, source and description from an aika mcp search
-     - query, repository name and description from a codesearch mcp search
-     - links and description of relevant webpages
+
+- The output of the spotify tool researcher may contain information from Spotify sources via mcp calls
+- Include the relevant information from the **Additional Resources**:
+  - query, source and description from an aika mcp search
+  - query, repository name and description from a codesearch mcp search
+  - links and description of relevant webpages
 
 11. **Sync and present findings:**
-   - Write the output to the `~/.claude/thoughts` directory (it should already exist from an earlier step)
-   - Present a concise summary of findings to the user
-   - Include key file references for easy navigation
-   - After creating the plan file, ask the user: "Would you like to ask follow-up questions or do you need any clarifications?"
+
+- Write the output to the `~/.claude/thoughts` directory (it should already exist from an earlier step)
+- Present a concise summary of findings to the user
+- Include key file references for easy navigation
+- After creating the plan file, ask the user: "Would you like to ask follow-up questions or do you need any clarifications?"
 
 12. **Handle follow-up questions:**
-   - If the user has follow-up questions, append to the same research document
-   - Update the frontmatter fields `last_updated` and `last_updated_by` to reflect the update
-   - Add `last_updated_note: "Added follow-up research for [brief description]"` to frontmatter
-   - Add a new section: `## Follow-up Research [timestamp]`
-   - Spawn new sub-agents as needed for additional investigation
-   - Continue updating the document and syncing
+
+- If the user has follow-up questions, append to the same research document
+- Update the frontmatter fields `last_updated` and `last_updated_by` to reflect the update
+- Add `last_updated_note: "Added follow-up research for [brief description]"` to frontmatter
+- Add a new section: `## Follow-up Research [timestamp]`
+- Spawn new sub-agents as needed for additional investigation
+- Continue updating the document and syncing
 
 ## Iteration Loop Structure
 
 This section clarifies how the iterative research loop works across steps 3, 4, 5, and 6.
 
 **Initial research phase (Iteration 0):**
+
 1. Step 2: Identify questions and create initial TODO list
 2. Step 3: Spawn Batch 1 agents (mark as "in_progress")
 3. Step 4: WAIT for Batch 1 to complete (mark as "completed"), spawn Batch 2 if needed, wait for completion
@@ -679,10 +574,12 @@ This section clarifies how the iterative research loop works across steps 3, 4, 
 6. Step 6: Mark validation as "in_progress", validate completeness
 
 **If all questions adequately answered (Iteration 0 success):**
+
 1. Step 6: Mark validation as "completed"
 2. Step 7: Proceed to metadata gathering
 
 **If gaps found (Iteration N, where N = 1 or 2):**
+
 1. Step 6: Mark validation as "completed"
 2. Step 6: **Update TODO list:**
    - Mark or remove previous synthesis task (it needs revision with new data)
@@ -697,6 +594,7 @@ This section clarifies how the iterative research loop works across steps 3, 4, 
 8. If N = 2 or all questions answered: Proceed to step 7
 
 **Critical rules:**
+
 - Synthesis can ONLY start when ALL current-phase agents are completed
 - Validation can ONLY start when synthesis is completed
 - New agents can ONLY spawn after validation identifies gaps
@@ -796,12 +694,14 @@ Visual representation of the research process state transitions:
 ```
 
 **Key State Transitions:**
+
 - `pending` → `in_progress` → `completed` for each task
 - Synthesis stays `pending` until ALL agents are `completed`
 - If gaps found, new iteration creates new pending tasks
 - Synthesis is NOT marked `completed` if gaps require more research
 
 ## Important notes:
+
 - **Execution plan**: Follow the sequenced execution plan from Step 2; run independent questions in parallel but sequence dependent questions to pass context forward
 - **Parallelism vs sequencing**: Default to parallelism when dependency is unclear; only sequence when earlier answers clearly improve later queries
 - Always run fresh research - never rely solely on existing research documents
@@ -835,4 +735,3 @@ Visual representation of the research process state transitions:
   - Update frontmatter when adding follow-up research
   - Use snake_case for multi-word field names (e.g., `last_updated`, `git_commit`)
   - Tags should be relevant to the research topic and components studied
-

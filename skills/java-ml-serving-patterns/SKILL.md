@@ -160,8 +160,6 @@ public CompletionStage<MLResponse> classify(Context context, String userId) {
 
 ## Related Skills
 
-- [hendrix-serving-salem](../hendrix-serving-salem/SKILL.md) - Python deployment (deploy models)
-- [hendrix-features-jukebox](../hendrix-features-jukebox/SKILL.md) - Python feature specs (training)
 
 ## Documentation Links
 

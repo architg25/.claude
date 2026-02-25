@@ -44,7 +44,6 @@ Then wait for the user's input.
 
 2. **Spawn initial research tasks to gather context**:
    Before asking the user any questions, use specialized agents to research in parallel:
-
    - Use the **codebase-locator** agent to find all files related to the ticket/task
    - Use the **codebase-analyzer** agent to understand how the current implementation works
    - If relevant, use the **thoughts-locator** agent to find any existing thoughts documents about this feature
@@ -72,6 +71,7 @@ Then wait for the user's input.
    - Determine true scope based on codebase reality
 
 5. **Present informed understanding and focused questions**:
+
    ```
    Based on the ticket and my research of the codebase, I understand we need to [accurate summary].
 
@@ -94,29 +94,12 @@ After initial codebase research completes, analyze findings for domain-specific 
 
 **Scan the ticket, research findings, and codebase for domain patterns:**
 
-| Domain | Patterns Found | Expert Agent | Include in Research? |
-|--------|---------------|--------------|---------------------|
-| Flyte/Liftoff | [matches] | flyte-liftoff-expert | Yes/No |
-| Luigi | [matches] | luigi-workflow-expert | Yes/No |
-| Scio/Beam | [matches] | scio-pipeline-optimization-analyzer | Yes/No |
-| Data Annotations | [matches] | data-annotation-reviewer | Yes/No |
-| Hendrix/ML | [matches] | hendrix-expert | Yes/No |
-| Backend Infra | [matches] | backend-infrastructure-expert | Yes/No |
-| Search/Indexing | [matches] | search-indexing-expert | Yes/No |
-| RCS/Experimentation | [matches] | experimentation-expert | Yes/No |
-
-**Output for user:**
-```
-## Domains Detected for Planning
-
-Based on ticket and codebase analysis:
-- ✓ [Domain]: Found "[pattern]" → Will include [agent-name] in research
-- ✗ [Domain]: Not detected
-```
+@commands/shared/domain-agent-registry.md
 
 **Spawn domain experts in parallel with standard research agents:**
 
 For each detected domain, spawn the corresponding expert with this prompt:
+
 ```
 Provide [DOMAIN] expertise for planning this implementation:
 
@@ -138,33 +121,9 @@ Include domain expert findings in the plan's research section.
 
 **Required: Agent Type Verification**
 
-After detecting domains, create an explicit agent contract:
+@commands/shared/agent-verification-pattern.md
 
-```
-## Agent Type Verification
-
-Based on the domains detected above, I will spawn the following agents:
-
-**Standard research agents:**
-- codebase-locator
-- codebase-analyzer
-- thoughts-locator (if applicable)
-- spotify-tool-researcher (if applicable)
-
-**Domain-based agents** (added based on detection):
-- [For each domain with "Yes": [Domain] → [agent-name]]
-
-**Full agent list:**
-1. [agent-1]
-2. [agent-2]
-...
-
-Total agents to spawn: [N]
-
-⚠️ This list is my CONTRACT.
-```
-
-Reference: See `commands/shared/agent-verification-pattern.md` for the full pattern.
+Create the agent contract listing standard research agents (codebase-locator, codebase-analyzer, thoughts-locator, spotify-tool-researcher) plus any domain-based agents detected above.
 
 ### Step 3: Research & Discovery
 
@@ -182,27 +141,13 @@ After getting initial clarifications:
 
 Before spawning, output verification table matching contract. If skipping any agent, provide reason and inform user.
 
-Reference: See `commands/shared/agent-verification-pattern.md` for the full pattern.
+@commands/shared/pre-spawn-verification.md
 
 3. **Spawn parallel sub-tasks for comprehensive research**:
    - Create multiple Task agents to research different aspects concurrently
    - Use the right agent for each type of research:
 
-   **For codebase investigation:**
-   - **codebase-locator** - To find more specific files (e.g., "find all files that handle [specific component]")
-   - **codebase-analyzer** - To understand implementation details (e.g., "analyze how [system] works")
-   - **codebase-pattern-finder** - To find similar features we can model after
-
-   **For Spotify Domain documentation and context:**
-   - **spotify-tool-researcher** - To find:
-     - Spotify tool/library documentation in Techdocs
-     - Existing implementations (potentially in non-related codebases) via codesearch
-     - The latest status of discussions in Slack
-     - Relevant context in Google Docs
-
-   **For historical context:**
-   - **thoughts-locator** - To find any research, plans, or decisions about this area
-   - **thoughts-analyzer** - To extract key insights from the most relevant documents
+   @commands/shared/subagent-types.md
 
    Each agent knows how to:
    - Find the right files and code patterns
@@ -214,7 +159,6 @@ Reference: See `commands/shared/agent-verification-pattern.md` for the full patt
    **MANDATORY (run in parallel with above): Search for existing reusable patterns**
 
    As part of the parallel sub-task spawning, ALWAYS include a dedicated task to find existing abstractions:
-
    - Use **codebase-pattern-finder** with prompts like:
      - "Find all abstract classes, interfaces, or base classes related to [component type]"
      - "Find what classes extend or implement the same interface as [similar existing feature]"
@@ -234,6 +178,7 @@ Reference: See `commands/shared/agent-verification-pattern.md` for the full patt
 4. **Wait for ALL sub-tasks to complete** before proceeding
 
 5. **Present findings and design options**:
+
    ```
    Based on my research, here's what I found:
 
@@ -257,6 +202,7 @@ Reference: See `commands/shared/agent-verification-pattern.md` for the full patt
 Once aligned on approach:
 
 1. **Create initial plan outline**:
+
    ```
    Here's my proposed plan structure:
 
@@ -303,6 +249,7 @@ After structure approval:
 [A Specification of the desired end state after this plan is complete, and how to verify it]
 
 ### Key Discoveries:
+
 - [Important finding with file:line reference]
 - [Pattern to follow]
 - [Constraint to work within]
@@ -320,20 +267,24 @@ After structure approval:
 **REQUIRED**: Document existing abstractions/patterns that were considered for this implementation.
 
 ### Patterns Found:
-| Pattern | Location | Usage Count | Applicable? |
-|---------|----------|-------------|-------------|
-| [Abstract class/Interface name] | `path/to/file.ext:line` | X existing usages | Yes/No |
-| ... | ... | ... | ... |
+
+| Pattern                         | Location                | Usage Count       | Applicable? |
+| ------------------------------- | ----------------------- | ----------------- | ----------- |
+| [Abstract class/Interface name] | `path/to/file.ext:line` | X existing usages | Yes/No      |
+| ...                             | ...                     | ...               | ...         |
 
 ### Decision:
+
 - **Will use**: [Pattern name] because [reason]
 - **Will NOT use**: [Pattern name] because [reason - e.g., doesn't fit our use case because X]
 
 ### Deviation from Prior Research (if applicable):
+
 > **Note**: The research document `~/.claude/thoughts/shared/research/YYYY-MM-DD-xxx.md` proposed [approach X],
 > but based on pattern analysis, this plan uses [approach Y] instead because [reason].
 >
 > Key differences:
+>
 > - Research proposed: [original approach]
 > - This plan uses: [new approach leveraging existing pattern]
 > - Rationale: [why the pattern-based approach is better]
@@ -343,11 +294,13 @@ After structure approval:
 ## Phase 1: [Descriptive Name]
 
 ### Overview
+
 [What this phase accomplishes]
 
 ### Changes Required:
 
 #### 1. [Component/File Group]
+
 **File**: `path/to/file.ext`
 **Changes**: [Summary of changes]
 
@@ -371,12 +324,14 @@ After structure approval:
 ### Success Criteria:
 
 #### Automated Verification:
+
 - [ ] Type checking passes: <COMMAND_FOR_RUNNING_TYPE_CHECKING> e.g. `mypy`
 - [ ] Linting passes: <COMMAND_FOR_RUNNING_TYPE_CHECKING> if applicable e.g. `flake8`, `ruff lint`
 - [ ] Tests pass: <COMMAND_FOR_RUNNING_TESTS> e.g. `mvn test`, `sbt test`
 - [ ] Formatting: <COMMAND_FOR_RUNNING_FORMATTING> e.g. `mvn fmt:format`, `sbt scalafmtAll`
 
 #### Manual Verification:
+
 - [ ] Feature works as expected when tested via UI
 - [ ] Performance is acceptable under load
 - [ ] Edge case handling verified manually
@@ -393,13 +348,16 @@ After structure approval:
 ## Testing Strategy
 
 ### Unit Tests:
+
 - [What to test]
 - [Key edge cases]
 
 ### Integration Tests:
+
 - [End-to-end scenarios]
 
 ### Manual Testing Steps:
+
 1. [Specific step to verify feature]
 2. [Another verification step]
 3. [Edge case to test manually]
@@ -422,7 +380,6 @@ After structure approval:
 ### Step 6: Sync and Review
 
 1. **Present the draft plan location**:
-
    - Create `~/.claude/thoughts/shared/plans/` directory if it doesn't exist already.
 
    ```
@@ -505,16 +462,19 @@ After structure approval:
    - User acceptance criteria
 
 **Format example:**
+
 ```markdown
 ### Success Criteria:
 
 #### Automated Verification:
+
 - [ ] Database migration runs successfully: `make migrate`
 - [ ] All unit tests pass: `go test ./...`
 - [ ] No linting errors: `golangci-lint run`
 - [ ] API endpoint returns 200: `curl localhost:8080/api/new-endpoint`
 
 #### Manual Verification:
+
 - [ ] New feature appears correctly in the UI
 - [ ] Performance is acceptable with 1000+ items
 - [ ] Error messages are user-friendly
@@ -524,6 +484,7 @@ After structure approval:
 ## Common Patterns
 
 ### For Database Changes:
+
 - Start with schema/migration
 - Add store methods
 - Update business logic
@@ -531,6 +492,7 @@ After structure approval:
 - Update clients
 
 ### For New Features:
+
 - Research existing patterns first
 - Start with data model
 - Build backend logic
@@ -538,6 +500,7 @@ After structure approval:
 - Implement UI last
 
 ### For Refactoring:
+
 - Document current behavior
 - Plan incremental changes
 - Maintain backwards compatibility
@@ -566,6 +529,7 @@ When spawning research sub-tasks:
    - Don't accept results that seem incorrect
 
 Example of spawning multiple tasks:
+
 ```python
 # Spawn these tasks concurrently:
 tasks = [

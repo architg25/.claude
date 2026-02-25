@@ -12,6 +12,7 @@ You are performing a comprehensive code tidy-up workflow. Follow this workflow e
 Arguments provided: `$ARGUMENTS`
 
 Parse the arguments to determine:
+
 - **Scope**: What code to tidy up
   - If `--branch <branch>` or `-b <branch>`: Compare current branch against specified branch
   - If `--staged` or `-s`: Only staged changes
@@ -35,40 +36,18 @@ Execute the following steps in order. Create a TODO list at the start to track p
    - Look for `pom.xml` (Java/Maven), `build.sbt` (Scala/sbt)
    - For mixed projects, prefer Scala/sbt
    - Store the detected type(s) for later steps
-4. **Detect domains in scope** (reference `commands/shared/domain-agent-registry.md`):
+4. **Detect domains in scope**:
    - Scan files in scope for domain-specific patterns
    - Check file paths for context signals (e.g., `ml/`, `search/`, `infra/`)
-   - **Output for user:**
-     ```
-     ## Domains Detected in Scope
-     - ✓ Scio/Beam: Found SCollection patterns
-     - ✓ Data Annotations: Found @BigQueryType annotations
-     - ✗ Other domains: Not detected
-     ```
+
+   @commands/shared/domain-agent-registry.md
    - Store detected domains for use in simplification steps
 
 **Required: Agent Type Verification**
 
-After detecting domains, create an explicit agent contract:
+@commands/shared/agent-verification-pattern.md
 
-```
-## Agent Type Verification
-
-Based on the project type and domains detected, I will spawn:
-
-**Language-based agents:**
-- [test-reviewer for language]
-- [code-simplification-reviewer for language]
-
-**Domain-based agents** (for Steps 3 and 5):
-- [For each domain with "✓": [Domain] → [agent-name]]
-
-Total unique agents: [N]
-
-⚠️ This list is my CONTRACT for Steps 2, 3, and 5.
-```
-
-Reference: See `commands/shared/agent-verification-pattern.md` for the full pattern.
+Create the agent contract listing language-based agents (test-reviewer, code-simplification-reviewer) plus any domain-based agents detected above. This contract governs Steps 2, 3, and 5.
 
 5. **Run baseline tests**:
    - Use the appropriate test command for the project type
@@ -82,6 +61,7 @@ Reference: See `commands/shared/agent-verification-pattern.md` for the full patt
 If scope is explicit file/directory paths, skip this step and use file-level scope for all subsequent steps.
 
 1. **Get diff with line numbers**:
+
    ```bash
    # For branch comparison
    git diff <branch>...HEAD --unified=0 --no-color
@@ -92,6 +72,7 @@ If scope is explicit file/directory paths, skip this step and use file-level sco
 
 2. **Parse diff into CHANGE_SCOPE**:
    Extract file paths and line ranges from the diff output. Create a structured scope:
+
    ```
    CHANGE_SCOPE:
    - file: src/main/java/com/example/UserService.java
@@ -113,7 +94,7 @@ If scope is explicit file/directory paths, skip this step and use file-level sco
 ### Step 2: Test Enhancement
 
 1. **Identify changed source files** (based on scope)
-2. **Run appropriate test reviewer sub-agent** (see `commands/shared/language-agent-registry.md` for full details):
+2. **Run appropriate test reviewer sub-agent**:
    - For Java files: Use `java-test-reviewer` sub-agent
    - For Scala files: Use `scala-scio-test-reviewer` sub-agent
    - For Python files: Use `python-test-reviewer` sub-agent
@@ -164,9 +145,9 @@ If scope is explicit file/directory paths, skip this step and use file-level sco
 
 Before spawning simplification agents, output verification table matching contract from Step 0. If skipping any agent, provide reason and inform user.
 
-Reference: See `commands/shared/agent-verification-pattern.md` for the full pattern.
+@commands/shared/pre-spawn-verification.md
 
-3. **Run appropriate simplification sub-agent on SOURCE files only** (see `commands/shared/language-agent-registry.md` for full details):
+3. **Run appropriate simplification sub-agent on SOURCE files only**:
    - For Java: Use `java-code-simplification-reviewer` sub-agent
    - For Scala: Use `scala-scio-code-simplification-reviewer` sub-agent
    - For Python: Use `python-code-simplification-reviewer` sub-agent
@@ -215,8 +196,8 @@ Reference: See `commands/shared/agent-verification-pattern.md` for the full patt
 
 1. **Detect schema files** in scope:
    - Scala files with `@BigQueryType`, `@description`, `saveAsTypedParquetFile`, or `ParquetType`
-   - Avro schema files (*.avsc)
-   - Protobuf files (*.proto) with spotify.data.metadata
+   - Avro schema files (\*.avsc)
+   - Protobuf files (\*.proto) with spotify.data.metadata
    - YAML/dbt files with policy annotations in descriptions
 
 2. **If schema files found**:
@@ -243,7 +224,7 @@ Reference: See `commands/shared/agent-verification-pattern.md` for the full patt
    - Create commit: `git commit -m "Checkpoint before test simplification"`
 2. **Identify test files** only:
    - Filter scope to only test files (e.g., `src/test/**`, files ending in `Test.java`, `Spec.scala`, etc.)
-3. **Run appropriate simplification sub-agent on TEST files only** (see `commands/shared/language-agent-registry.md` for full details):
+3. **Run appropriate simplification sub-agent on TEST files only**:
    - For Java: Use `java-code-simplification-reviewer` sub-agent
    - For Scala: Use `scala-scio-code-simplification-reviewer` sub-agent
    - For Python: Use `python-code-simplification-reviewer` sub-agent
@@ -374,11 +355,13 @@ Reference: See `commands/shared/agent-verification-pattern.md` for the full patt
 ## Sub-agent Usage
 
 You will use these sub-agents via the Task tool:
+
 - `codebase-locator`: For finding coding guidelines
 - `java-test-reviewer` or `scala-scio-test-reviewer`: For test enhancement review
 - `java-code-simplification` or `scala-scio-simplification`: For code simplification review
 
 Always provide clear, specific prompts to sub-agents including:
+
 - What files to process
 - What the goal is
 - Any special instructions (e.g., "only if it improves clarity" for tests)

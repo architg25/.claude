@@ -43,6 +43,11 @@ When multiple valid approaches exist, choose based on:
 
 - On first user prompt, run `/rename` in a background haiku subagent to set a descriptive terminal title based on the task.
 
+## Spotify Tool Conventions
+
+- **Statements MCP/CLI**: Only for debugging entities (episode, show, audiobook, audiobookChapter). Never for feature development.
+- **Jira**: Default project is CONACCESS. Always hyperlink tickets with URL and show current status.
+
 ## Important Reminders
 
 **NEVER**:
