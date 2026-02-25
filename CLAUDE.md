@@ -39,6 +39,10 @@ When multiple valid approaches exist, choose based on:
 4. **Simplicity** - Is this the simplest solution that works?
 5. **Reversibility** - How hard to change later?
 
+## Auto-invoke
+
+- On first user prompt, spawn a background haiku agent to set the terminal title via `bash ~/.claude/skills/terminal-title/scripts/set_title.sh "Title"`. Title: max 40 chars, format `[Action]: [Focus]`.
+
 ## Important Reminders
 
 **NEVER**:
