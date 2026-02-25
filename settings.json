@@ -1,8 +1,10 @@
 {
   "env": {
     "model": "claude-opus-4-6[1m]",
-    "EDITOR": "zed"
+    "EDITOR": "zed",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
+  "teammateMode": "tmux",
   "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
@@ -58,11 +60,27 @@
       "mcp__atlassian-mcp__get_available_transitions",
       "mcp__bigquery-mcp__*",
       "mcp__groove-mcp__*",
-      "mcp__google-drive-mcp__*"
+      "mcp__google-drive-mcp__*",
+      "Read",
+      "Write",
+      "Grep",
+      "Glob",
+      "NotebookEdit",
+      "WebFetch",
+      "WebSearch",
+      "Task",
+      "AskUserQuestion",
+      "TaskCreate",
+      "TaskUpdate",
+      "TaskGet",
+      "TaskList",
+      "TeamCreate",
+      "TeamDelete",
+      "SendMessage",
+      "Skill",
+      "EnterWorktree"
     ],
-    "deny": [
-      "Bash(bazel clean:*)"
-    ],
+    "deny": ["Bash(bazel clean:*)"],
     "ask": [
       "Bash(spt git:sparse:*)",
       "Skill(migrate-mma-dashboards)",
@@ -129,7 +147,8 @@
     "pr-review-toolkit@claude-code-plugins": false,
     "commit-commands@claude-code-plugins": false,
     "agent-sdk-dev@claude-code-plugins": false,
-    "claude-mem@thedotmack": false
+    "claude-mem@thedotmack": false,
+    "playground@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true
 }
