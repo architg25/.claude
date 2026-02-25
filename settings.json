@@ -5,91 +5,7 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "includeCoAuthoredBy": false,
-  "permissions": {
-    "allow": [
-      "Bash(gh pr list:*)",
-      "Bash(gh pr view:*)",
-      "Bash(gh pr checks:*)",
-      "Bash(gh pr diff:*)",
-      "Bash(gh pr create:*)",
-      "Bash(gh pr ready:*)",
-      "Bash(gh pr review:*)",
-      "Bash(git fetch:*)",
-      "Bash(git checkout:*)",
-      "Bash(git commit:*)",
-      "Bash(git add:*)",
-      "Bash(git cherry-pick:*)",
-      "Bash(git status:*)",
-      "Bash(git push:*)",
-      "Bash(git pull:*)",
-      "Bash(python3:*)",
-      "Bash(find:*)",
-      "Bash(awk:*)",
-      "Bash(fd:*)",
-      "Bash(cat:*)",
-      "Bash(head:*)",
-      "Bash(mvn:*)",
-      "Bash(mvnd:*)",
-      "Bash(rg:*)",
-      "Bash(grep:*)",
-      "Bash(ls:*)",
-      "Bash(cd:*)",
-      "Bash(mkdir:*)",
-      "Bash(backstagecli:*)",
-      "Bash(bazel build:*)",
-      "Bash(bazel cquery:*)",
-      "Bash(bazel query:*)",
-      "Bash(bazel run //:format:*)",
-      "Bash(bazel run //tools/importer:*)",
-      "Bash(bazel test:*)",
-      "mcp__code-search__*",
-      "mcp__aika-search__*",
-      "mcp__sequential-thinking__*",
-      "mcp__context7__*",
-      "mcp__plugin_claude-mem_claude-mem-search__*",
-      "mcp__google-calendar-mcp__list_calendar_events",
-      "mcp__google-calendar-mcp__get_calendar_event",
-      "mcp__google-calendar-mcp__list_calendars",
-      "mcp__cloud-logging-mcp__*",
-      "mcp__context-mcp__*",
-      "mcp__o11y-agg-mcp__*",
-      "mcp__backstage-mcp-actions__*",
-      "mcp__atlassian-mcp__list_tickets",
-      "mcp__atlassian-mcp__get_project_info",
-      "mcp__atlassian-mcp__search_issues_advanced",
-      "mcp__atlassian-mcp__get_available_transitions",
-      "mcp__bigquery-mcp__*",
-      "mcp__groove-mcp__*",
-      "mcp__google-drive-mcp__*",
-      "Read",
-      "Write",
-      "Grep",
-      "Glob",
-      "NotebookEdit",
-      "WebFetch",
-      "WebSearch",
-      "Task",
-      "AskUserQuestion",
-      "TaskCreate",
-      "TaskUpdate",
-      "TaskGet",
-      "TaskList",
-      "TeamCreate",
-      "TeamDelete",
-      "SendMessage",
-      "Skill",
-      "EnterWorktree"
-    ],
-    "deny": ["Bash(bazel clean:*)"],
-    "ask": [
-      "Bash(spt git:sparse:*)",
-      "Skill(migrate-mma-dashboards)",
-      "mcp__atlassian-mcp__create_ticket",
-      "mcp__atlassian-mcp__create_ticket_advanced",
-      "mcp__atlassian-mcp__edit_ticket",
-      "mcp__honk-coding-agent-mcp-experimental__*"
-    ]
-  },
+  "permissions": {},
   "model": "claude-opus-4-6[1m]",
   "enableAllProjectMcpServers": true,
   "hooks": {
@@ -120,6 +36,17 @@
           {
             "type": "command",
             "command": "bash -c 'CMD=$(jq -r \".tool_input.command\" < /dev/stdin); if echo \"$CMD\" | grep -q \"git commit\"; then echo \"{\\\"additionalContext\\\": \\\"Before committing, ensure tests pass and code is formatted.\\\"}\"; fi'"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/permission-manager.sh"
           }
         ]
       }
