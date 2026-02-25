@@ -32,31 +32,29 @@ python3 ~/.claude/skills/document-archive/scripts/archive.py excalidraw "<url-or
 
 ## Google Doc Workflow
 
-### Step 1: Read the document
+Google Docs are saved as **bookmarks only** (metadata, no content snapshot) since they're living documents.
 
-Use the `get_document_structure` MCP tool to see sections:
+### Reading docs
 
+Use the google-docs skill script (NOT MCP) to read documents — this runs via Bash and works in subagents:
+
+```bash
+python3 ~/.claude/skills/google-docs/scripts/gdocs.py read <doc-id>
 ```
-mcp__google-drive-mcp__get_document_structure(fileId="<doc-id>")
-```
 
-Then use `get_document_section` to read all sections. Also use `get_drive_file_metadata` for the doc title.
+Extract the doc ID from the URL: `https://docs.google.com/document/d/<doc-id>/edit`
 
-### Step 2: Generate title, description, and identify initiative
+### Single doc save
 
-From the document content:
-
-1. **Title**: Short kebab-case filename derived from the doc title
-2. **Description**: 1-2 sentence summary of the document's purpose
-3. **Initiative**: Look for Groove initiative references (INIT-xxx), project names, or bet references
-
-### Step 3: Export and save
-
-Write the full document content as markdown to a temp file, then:
+1. Read the doc with `gdocs.py read <doc-id>`
+2. From the content, generate:
+   - **Title**: Short kebab-case filename derived from the doc title
+   - **Description**: 1-2 sentence summary
+   - **Initiative**: Look for Groove initiative references (INIT-xxx), project names, or bet references
+3. Save:
 
 ```bash
 python3 ~/.claude/skills/document-archive/scripts/archive.py google-doc "<name>" \
-  --content-file /tmp/doc-export.md \
   --source "https://docs.google.com/document/d/<doc-id>/edit" \
   --title "<doc title>" \
   --description "<desc>" \
@@ -64,9 +62,26 @@ python3 ~/.claude/skills/document-archive/scripts/archive.py google-doc "<name>"
   --initiative "<initiative>"
 ```
 
+This creates only a `.meta.json`. The source link points to the live doc.
+
+### Batch saving multiple docs
+
+When saving many Google Docs at once, **use parallel subagents** (via the Task tool with `run_in_background: true`):
+
+1. Split docs into batches of 5
+2. Launch one subagent per batch — each agent reads docs via `gdocs.py read`, generates metadata, and runs `archive.py google-doc` for each
+3. After all agents complete, run `archive.py index` to regenerate the README
+4. Commit and push
+
+Each subagent prompt should include the doc IDs, titles, and meta paths, and instruct it to:
+
+- Read each doc with: `python3 ~/.claude/skills/google-docs/scripts/gdocs.py read <doc-id>`
+- Generate a 1-sentence description and identify initiatives
+- Save with: `python3 ~/.claude/skills/document-archive/scripts/archive.py google-doc ...`
+
 ### Skip analysis when user provides a name
 
-If the user explicitly provides a name, skip the analysis/generation steps.
+If the user explicitly provides a name, skip the read step and save directly.
 
 ## After saving
 

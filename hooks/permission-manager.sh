@@ -87,7 +87,7 @@ fi
 
 # EnterPlanMode (agent workflow)
 [[ "$TOOL" == "EnterPlanMode" ]] && allow "Plan mode"
-[[ "$TOOL" == "ExitPlanMode" ]] && allow "Plan mode"
+[[ "$TOOL" == "ExitPlanMode" ]] && ask "Plan mode"
 
 # ── No match → show permission dialog to user ──────────────
 exit 0

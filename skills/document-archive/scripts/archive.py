@@ -181,28 +181,21 @@ def cmd_save_excalidraw(args):
 
     print(f"Saved: {scene_path}")
     print(f"Meta:  {meta_path}")
+    update_index()
 
 
 def cmd_save_google_doc(args):
-    content_path = Path(args.content_file).expanduser().resolve()
-    if not content_path.exists():
-        print(f"Error: Content file not found: {content_path}", file=sys.stderr)
-        sys.exit(1)
-
-    content = content_path.read_text(encoding="utf-8")
     name = args.name
     tags = [t.strip() for t in args.tags.split(",")] if args.tags else []
 
     out_dir = ARCHIVE_ROOT / "google-docs"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    doc_path = out_dir / f"{name}.md"
     meta_path = out_dir / f"{name}.meta.json"
 
-    if doc_path.exists():
-        print(f"Warning: {doc_path} already exists, overwriting.", file=sys.stderr)
+    if meta_path.exists():
+        print(f"Warning: {meta_path} already exists, overwriting.", file=sys.stderr)
 
-    doc_path.write_text(content, encoding="utf-8")
     write_meta(
         meta_path,
         build_meta(
@@ -215,8 +208,73 @@ def cmd_save_google_doc(args):
         ),
     )
 
-    print(f"Saved: {doc_path}")
-    print(f"Meta:  {meta_path}")
+    print(f"Saved: {meta_path}")
+    update_index()
+
+
+def update_index():
+    """Regenerate README.md from all .meta.json files."""
+    entries = []
+    for meta_path in sorted(ARCHIVE_ROOT.rglob("*.meta.json")):
+        with open(meta_path) as f:
+            meta = json.load(f)
+        meta["_dir"] = meta_path.parent.name
+        entries.append(meta)
+
+    # Group by initiative (empty initiative goes under "Uncategorized")
+    by_initiative: dict[str, list[dict]] = {}
+    for e in entries:
+        key = e.get("initiative") or "Uncategorized"
+        by_initiative.setdefault(key, []).append(e)
+
+    lines = ["# Document Archive\n"]
+
+    # Summary
+    lines.append(f"**{len(entries)} documents** archived.\n")
+
+    # Table of contents
+    for initiative in sorted(
+        by_initiative.keys(), key=lambda k: (k == "Uncategorized", k)
+    ):
+        anchor = (
+            initiative.lower()
+            .replace(" ", "-")
+            .replace("(", "")
+            .replace(")", "")
+            .replace(",", "")
+        )
+        lines.append(f"- [{initiative}](#{anchor})")
+    lines.append("")
+
+    # Sections by initiative
+    for initiative in sorted(
+        by_initiative.keys(), key=lambda k: (k == "Uncategorized", k)
+    ):
+        lines.append(f"## {initiative}\n")
+        lines.append("| Type | Title | Description | Tags | Saved |")
+        lines.append("|------|-------|-------------|------|-------|")
+
+        for e in sorted(
+            by_initiative[initiative], key=lambda x: x.get("saved", ""), reverse=True
+        ):
+            doc_type = e.get("type", "")
+            title = e.get("title", "")
+            source = e.get("source", "")
+            if source:
+                title = f"[{title}]({source})"
+            desc = e.get("description", "")
+            # Truncate long descriptions for the table
+            if len(desc) > 100:
+                desc = desc[:97] + "..."
+            tags = ", ".join(e.get("tags", []))
+            saved = e.get("saved", "")
+            lines.append(f"| {doc_type} | {title} | {desc} | {tags} | {saved} |")
+
+        lines.append("")
+
+    readme_path = ARCHIVE_ROOT / "README.md"
+    readme_path.write_text("\n".join(lines), encoding="utf-8")
+    print(f"Index: {readme_path}")
 
 
 def main():
@@ -237,14 +295,14 @@ def main():
     # google-doc subcommand
     gdoc = sub.add_parser("google-doc", help="Save a Google Doc")
     gdoc.add_argument("name", help="Name for the document (without extension)")
-    gdoc.add_argument(
-        "--content-file", required=True, help="Path to markdown content file"
-    )
     gdoc.add_argument("--source", help="Original Google Doc URL")
     gdoc.add_argument("--title", help="Document title (defaults to name)")
     gdoc.add_argument("--description", help="Description for metadata")
     gdoc.add_argument("--tags", help="Comma-separated tags")
     gdoc.add_argument("--initiative", help="Initiative or project name")
+
+    # index subcommand
+    sub.add_parser("index", help="Regenerate README.md index")
 
     args = parser.parse_args()
 
@@ -252,6 +310,8 @@ def main():
         cmd_save_excalidraw(args)
     elif args.command == "google-doc":
         cmd_save_google_doc(args)
+    elif args.command == "index":
+        update_index()
 
 
 if __name__ == "__main__":
