@@ -41,7 +41,7 @@ When multiple valid approaches exist, choose based on:
 
 ## Auto-invoke
 
-- On first user prompt, spawn a background haiku agent to set the terminal title via `bash ~/.claude/skills/terminal-title/scripts/set_title.sh "Title"`. Title: max 40 chars, format `[Action]: [Focus]`.
+- On first user prompt, run `/rename` in a background haiku subagent to set a descriptive terminal title based on the task.
 
 ## Important Reminders
 
