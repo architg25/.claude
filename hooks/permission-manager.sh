@@ -46,7 +46,7 @@ if [[ "$TOOL" == "Bash" ]]; then
   [[ "$COMMAND" =~ ^bazel\ run\ (//:format|//tools/importer) ]] && allow "Bazel run"
 
   # Common CLI
-  [[ "$COMMAND" =~ ^(python3|find|awk|fd|cat|head|rg|grep|ls|cd|mkdir|backstagecli)( |$) ]] && allow "CLI tool"
+  [[ "$COMMAND" =~ ^(echo|sed|python3|find|awk|fd|cat|head|rg|grep|ls|cd|mkdir|backstagecli)( |$) ]] && allow "CLI tool"
 fi
 
 # ── MCP tools ───────────────────────────────────────────────
