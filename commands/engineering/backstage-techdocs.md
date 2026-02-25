@@ -41,7 +41,7 @@ mcp__code-search-mcp__read_file("docs/index.md", "<repo-name>")
 If Code Search returns no results, use Aika MCP:
 
 ```
-mcp__aika-search-mcp__spotify_internal_search(
+mcp__claude_ai_AiKA_Search_MCP__spotify_internal_search(
   query = "<component-name>",
   data_source = "techdocs"
 )

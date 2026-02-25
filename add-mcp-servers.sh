@@ -14,29 +14,20 @@ claude mcp add sequential-thinking -- npx -y @modelcontextprotocol/server-sequen
 echo "Adding context7..."
 claude mcp add --transport http --scope user context7 https://mcp.context7.com/sse
 
-# Add Aika Search MCP
-echo "Adding aika-search..."
-claude mcp add --transport http --scope user aika-search https://mcp-gateway.spotify.net/aika-search-mcp
+# aika-search: REMOVED — duplicate of claude.ai AiKA Search MCP
 
 # Add Code Search MCP
 echo "Adding code-search..."
 claude mcp add --transport http --scope user code-search https://mcp-gateway.spotify.net/code-search-mcp
 
-# Add GHE MCP
-echo "Adding ghe-mcp..."
-claude mcp add --transport http --scope user ghe-mcp https://ghe-mcp.spotify.net/mcp/
-
-# Add Backstage MCP Actions
-echo "Adding backstage-mcp-actions..."
-claude mcp add --transport http --scope user backstage-mcp-actions http://backstage-mcp-actions.services.gew1.spotify.net:7007/api/mcp-actions/v1
+# ghe-mcp: REMOVED — not loading (0 tools)
+# backstage-mcp-actions: REMOVED — not loading (0 tools)
 
 # Add Atlassian MCP
 echo "Adding atlassian-mcp..."
 claude mcp add --transport http --scope user atlassian-mcp https://mcp-gateway.spotify.net/atlassian-mcp
 
-# Add BigQuery MCP
-echo "Adding bigquery-mcp..."
-claude mcp add --transport http --scope user bigquery-mcp https://mcp-gateway.spotify.net/bigquery-mcp
+# bigquery-mcp: REMOVED — duplicate of claude.ai Big Query MCP
 
 # Add Cloud Logging MCP
 echo "Adding cloud-logging-mcp..."
@@ -46,9 +37,7 @@ claude mcp add --transport http --scope user cloud-logging-mcp https://mcp-gatew
 echo "Adding context-mcp..."
 claude mcp add --transport http --scope user context-mcp https://mcp-gateway.spotify.net/context-mcp
 
-# Add Google Calendar MCP
-echo "Adding google-calendar-mcp..."
-claude mcp add --transport http --scope user google-calendar-mcp https://mcp-gateway.spotify.net/google-calendar-mcp
+# google-calendar-mcp: REMOVED — not loading; calendar available via search_workplace_knowledge
 
 # Add Observability Aggregation MCP
 echo "Adding o11y-agg-mcp..."

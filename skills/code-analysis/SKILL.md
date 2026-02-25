@@ -76,12 +76,12 @@ Broad to specific:
 
 ### Tool Selection
 
-| Need                           | Tool                                                |
-| ------------------------------ | --------------------------------------------------- |
-| Quick file/class lookup        | Glob, Grep directly                                 |
-| Cross-repo search              | `code-search` MCP (`mcp__code-search__search_code`) |
-| Deep dive requiring many reads | `Explore` subagent via Task tool                    |
-| Spotify internal docs          | `aika-search` MCP                                   |
+| Need                           | Tool                                                                                    |
+| ------------------------------ | --------------------------------------------------------------------------------------- |
+| Quick file/class lookup        | Glob, Grep directly                                                                     |
+| Cross-repo search              | `code-search` MCP (`mcp__code-search__search_code`)                                     |
+| Deep dive requiring many reads | `Explore` subagent via Task tool                                                        |
+| Spotify internal docs          | `claude.ai AiKA Search` MCP (`mcp__claude_ai_AiKA_Search_MCP__spotify_internal_search`) |
 
 ### PR Review Workflow
 
