@@ -1,7 +1,7 @@
 ---
 name: interactive-code-map
 description: >
-  Generate an interactive HTML code map for a codebase component. Creates a self-contained
+  Generate an interactive HTML code map for a codebase component. Creates a multi-file
   playground with pipeline visualization, step-by-step flow tracer, output format comparison,
   change impact analysis, and FAQ. Use when user asks to "create a code map", "visualize the
   pipeline", "interactive flow diagram", "debug flow visualization", or wants to understand
@@ -11,7 +11,7 @@ argument-hint: [component-path]
 
 # Interactive Code Map
 
-Generate a self-contained HTML playground that visualizes how data flows through a codebase component. The output is a single HTML file with 5 interactive tabs for learning, debugging, and change impact analysis.
+Generate a multi-file HTML playground that visualizes how data flows through a codebase component. The output is a `code-map/` folder with HTML, CSS, and JS files organized into 5 interactive tabs for learning, debugging, and change impact analysis.
 
 ## When to Use
 
@@ -33,13 +33,22 @@ Generate a self-contained HTML playground that visualizes how data flows through
 
 The user provides a **component path** (e.g., `statements-audiobooks/statements-critical-path-audiobook/projections/audiobook`). If not provided, ask for it.
 
-Determine the **output location** — write the HTML file at the component root (next to `src/`), named `code-map.html`.
+**Output location:** Create a `code-map/` folder at the component root (next to `src/`), containing:
+
+| File          | Contents                                         |
+| ------------- | ------------------------------------------------ |
+| `index.html`  | HTML structure with `<link>` and `<script>` tags |
+| `styles.css`  | All CSS (aesthetic driven by `/frontend-design`) |
+| `core.js`     | Pipeline data, tracer data, shared functions     |
+| `analysis.js` | Comparison, impact, FAQ data and rendering       |
+
+**Work directory:** `<component-path>/.claude/codemap-work/` — all intermediate files go here. This keeps artifacts local to the component being mapped.
 
 ---
 
 ## Phase 1: Explore
 
-Create a team named `codemap-explore` with 3 specialized agents running in parallel. Each agent writes a structured markdown deliverable to `.claude/codemap-work/`.
+Create a team named `codemap-explore` with 3 specialized agents running in parallel. Each agent writes a structured markdown deliverable to `<component-path>/.claude/codemap-work/`.
 
 ### Agent: `architect`
 
@@ -55,7 +64,7 @@ Create a team named `codemap-explore` with 3 specialized agents running in paral
 - Entity types that flow through the pipeline
 - Step composition pattern (sequential, parallel, fan-out)
 
-**Write to:** `.claude/codemap-work/architecture.md`
+**Write to:** `<component-path>/.claude/codemap-work/architecture.md`
 
 ### Agent: `data-analyst`
 
@@ -66,11 +75,11 @@ Create a team named `codemap-explore` with 3 specialized agents running in paral
 - All entity types flowing through the component
 - Subscribed fields per entity type (what triggers processing)
 - Field routing logic (which fields cascade to child entities)
-- Converter field mappings: source field → output field per output format
+- Converter field mappings: source field -> output field per output format
 - Data model record shapes with field types (input models, intermediate models, output models)
 - Validation rules and what makes an entity valid/invalid
 
-**Write to:** `.claude/codemap-work/data-analysis.md`
+**Write to:** `<component-path>/.claude/codemap-work/data-analysis.md`
 
 ### Agent: `gotcha-hunter`
 
@@ -86,15 +95,15 @@ Create a team named `codemap-explore` with 3 specialized agents running in paral
 - "If I change X, what breaks?" dependency chains
 - Fields or behaviors where output format variants diverge intentionally
 
-**Write to:** `.claude/codemap-work/gotchas.md`
+**Write to:** `<component-path>/.claude/codemap-work/gotchas.md`
 
 ### Team Lead Synthesis
 
-After all 3 agents complete, read all 3 deliverables and synthesize into a unified data spec at `.claude/codemap-work/unified-spec.md`. This spec feeds Phase 2.
+After all 3 agents complete, read all 3 deliverables and synthesize into a unified data spec at `<component-path>/.claude/codemap-work/unified-spec.md`. This spec feeds Phase 2.
 
 The unified spec should contain:
 
-1. **Entity list** with color assignments (use the palette: blue, green, purple, orange — extend with cyan, red, yellow if needed)
+1. **Entity list** with color assignments (use a palette of 4-7 distinct colors)
 2. **Pipeline steps** in order with entity participation per step
 3. **Field index** — every field mapped to its converters and output locations
 4. **Gotcha list** with severity ratings (high/medium/low)
@@ -107,22 +116,32 @@ The unified spec should contain:
 
 Create a team named `codemap-build` with 4 agents. The `assembler` is blocked by the other 3.
 
-Read `references/tab-patterns.md` before starting this phase — it contains the HTML structure, CSS conventions, JS data shapes, and rendering patterns for each tab.
+Read `references/tab-patterns.md` before starting this phase — it contains the HTML structure, CSS class conventions, JS data shapes, and rendering patterns for each tab.
 
 ### Agent: `css-html`
 
 **Uses:** All 3 explore outputs + unified spec
 
-**Instructions:** Build the CSS and HTML skeleton:
+**Instructions:**
 
-- CSS custom properties for the dark theme color palette (see tab-patterns.md)
+1. **Invoke the `/frontend-design` skill** to establish the aesthetic direction for this code map. The component's domain and purpose should inform the tone (e.g., a financial pipeline might warrant a refined/editorial feel, a real-time event processor might call for something more industrial/utilitarian, a music metadata pipeline might go playful).
+2. Using that aesthetic direction, build two files:
+
+**`styles.css`** — Complete stylesheet:
+
+- CSS custom properties populating the names defined in `tab-patterns.md` (`--bg-primary`, `--bg-secondary`, `--bg-tertiary`, `--bg-card`, `--border`, `--border-light`, `--text-primary`, `--text-secondary`, `--text-muted`, entity color vars `--blue`, `--green`, `--purple`, `--orange`, etc. with matching `-dim` variants, and font vars `--font-mono`, `--font-system`)
+- Typography loaded via `@import` from Google Fonts (the one allowed external dependency)
+- Toolbar, tab bar, tab panel, pipeline, tracer, comparison, impact, and FAQ component styles
+- Responsive layout using CSS grid/flexbox
+- Animations and micro-interactions per `/frontend-design` direction
+
+**`skeleton.html`** — HTML structure:
+
 - Toolbar with entity type toggle buttons (pill-shaped, color-coded)
 - Tab bar with 5 tabs: Pipeline, Tracer, Comparison, Impact, FAQ
 - HTML panel containers for each tab
-- Responsive layout using CSS grid/flexbox
-- All CSS inline in a `<style>` block
 
-**Write to:** `.claude/codemap-work/skeleton.html`
+**Write to:** `<component-path>/.claude/codemap-work/skeleton.html` and `<component-path>/.claude/codemap-work/styles.css`
 
 ### Agent: `core-js`
 
@@ -141,7 +160,7 @@ Read `references/tab-patterns.md` before starting this phase — it contains the
 - Entity toggle function affecting pipeline highlighting and tracer content
 - Tab switching function
 
-**Write to:** `.claude/codemap-work/core.js`
+**Write to:** `<component-path>/.claude/codemap-work/core.js`
 
 ### Agent: `analysis-js`
 
@@ -150,60 +169,67 @@ Read `references/tab-patterns.md` before starting this phase — it contains the
 **Instructions:** Build the analysis JavaScript:
 
 - Comparison tab: `buildComparisonTab()` with side-by-side field mapping tables, inline warning badges for gotchas, key differences callout section
-- Impact tab: `fieldIndex{}` object for field reverse lookup (field → converters → output locations), `gotchas[]` array with severity/title/location/detail/impact/tested, `dependencyChains[]` array, `buildImpactTab()` with dropdown field selector and result rendering
+- Impact tab: `fieldIndex{}` object for field reverse lookup (field -> converters -> output locations), `gotchas[]` array with severity/title/location/detail/impact/tested, `dependencyChains[]` array, `buildImpactTab()` with dropdown field selector and result rendering
 - FAQ tab: `buildFAQ()` with interactive decision tree ("why didn't X happen?") and accordion Q&A, entity-aware highlighting
 - All highlight/filter functions for entity toggling on these tabs
 
-**Write to:** `.claude/codemap-work/analysis.js`
+**Write to:** `<component-path>/.claude/codemap-work/analysis.js`
 
 ### Agent: `assembler` (blocked by above 3)
 
 **Uses:** All 3 builder outputs
 
-**Instructions:** Assemble the final HTML file:
+**Instructions:** Assemble the final output into the `code-map/` folder:
 
-1. Read `skeleton.html`, `core.js`, and `analysis.js`
-2. Combine into a single self-contained HTML file
-3. Place all JS in a single `<script>` block after the HTML
-4. Add initialization: `document.addEventListener('DOMContentLoaded', init)` that builds all tabs and sets up event listeners
-5. Verify no external dependencies (no CDN links, no imports)
-6. Write to the output location determined in the Input step
+1. Read `skeleton.html`, `styles.css`, `core.js`, and `analysis.js` from the work directory
+2. Create the `code-map/` folder at the component root
+3. Copy `styles.css` -> `code-map/styles.css`
+4. Copy `core.js` -> `code-map/core.js`
+5. Copy `analysis.js` -> `code-map/analysis.js`
+6. Build `code-map/index.html` from `skeleton.html`:
+   - Add `<link rel="stylesheet" href="styles.css">` in the `<head>`
+   - Add `<script src="core.js"></script>` and `<script src="analysis.js"></script>` before `</body>`
+   - Add initialization: `<script>document.addEventListener('DOMContentLoaded', init)</script>` after the JS includes
+7. Verify no unexpected external dependencies (only allowed: Google Fonts `@import` in CSS)
 
 ---
 
 ## Phase 3: Review
 
-Spawn a single review agent to evaluate the assembled HTML file. The reviewer should read the file and evaluate against these criteria:
+Spawn a single review agent to evaluate the assembled `code-map/` folder. The reviewer should read all 4 files and evaluate against these criteria:
 
 1. **Learning:** Can I understand how data flows through this component by using the Pipeline and Tracer tabs?
 2. **Debugging:** Can I spot where bugs might hide using the Impact tab's gotcha cards?
 3. **Change impact:** Can I answer "if I change field X, what breaks?" using the Impact tab's field lookup?
 4. **Completeness:** Are all entity types represented? Are all processing steps covered?
 5. **Navigation:** Do class names link to file paths? Do entity buttons filter all tabs?
+6. **Visual quality:** Does the design feel intentional and polished, not generic? Does it reflect the `/frontend-design` aesthetic direction?
 
-Return a prioritized list of gaps (critical → nice-to-have).
+Return a prioritized list of gaps (critical -> nice-to-have).
 
 ---
 
 ## Phase 4: Enhance
 
-Apply the review findings via targeted edits to the assembled HTML file. Focus on critical gaps first. Skip nice-to-haves unless they're trivial to add.
+Apply the review findings via targeted edits to the files in `code-map/`. Focus on critical gaps first. Skip nice-to-haves unless they're trivial to add.
 
 ---
 
 ## Cleanup
 
-Delete the `.claude/codemap-work/` directory after the final file is assembled and reviewed.
+Delete the `<component-path>/.claude/codemap-work/` directory after the final files are assembled and reviewed.
 
 ---
 
 ## Technical Conventions
 
-These are non-negotiable for the output HTML:
+These are non-negotiable for the output:
 
-- **Single self-contained HTML file** — zero external dependencies
-- **Dark theme** using CSS custom properties (see tab-patterns.md for the palette)
-- **Vanilla JS** — no frameworks, no build tools
+- **Multi-file output in `code-map/` folder** — `index.html`, `styles.css`, `core.js`, `analysis.js`
+- **No external JS dependencies** — vanilla JS only, no frameworks, no build tools
+- **One allowed external CSS dependency** — Google Fonts (or similar) via `@import` for typography
+- **Aesthetic direction via `/frontend-design`** — each code map should feel designed for its domain, not stamped from a generic template
+- **CSS custom properties** for theming — property names from `tab-patterns.md` are the contract between CSS and JS
 - **CSS grid/flexbox** for layout, **SVG** for diagrams
 - **Data-driven rendering** — all content lives in JS objects, rendering functions consume them
 - **Navigable class names** — clicking a class name shows a popup with file path, methods, and responsibility

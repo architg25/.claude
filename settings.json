@@ -4,7 +4,6 @@
     "EDITOR": "zed",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
-  "teammateMode": "tmux",
   "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
@@ -23,6 +22,7 @@
       "Bash(git status:*)",
       "Bash(git push:*)",
       "Bash(git pull:*)",
+      "Bash(python3:*)",
       "Bash(find:*)",
       "Bash(awk:*)",
       "Bash(fd:*)",
@@ -148,7 +148,9 @@
     "commit-commands@claude-code-plugins": false,
     "agent-sdk-dev@claude-code-plugins": false,
     "claude-mem@thedotmack": false,
-    "playground@claude-plugins-official": true
+    "playground@claude-plugins-official": true,
+    "frontend-design@claude-code-plugins": true
   },
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": true,
+  "teammateMode": "tmux"
 }

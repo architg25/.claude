@@ -4,49 +4,56 @@ Reusable structure for the 5 interactive tabs in an HTML code map. Each section 
 
 ---
 
-## Color Palette (CSS Custom Properties)
+## CSS Custom Property Contract
+
+The following property **names** are referenced by JS and HTML throughout the code map. The `css-html` agent must define values for all of them based on the aesthetic direction from `/frontend-design`. The values below are placeholders — not defaults.
 
 ```css
 :root {
-  /* Backgrounds */
-  --bg-primary: #0d1117;
-  --bg-secondary: #161b22;
-  --bg-tertiary: #21262d;
-  --bg-card: #1c2128;
+  /* Backgrounds — 4 tiers from darkest/deepest to lightest/surface */
+  --bg-primary: /* ... */;
+  --bg-secondary: /* ... */;
+  --bg-tertiary: /* ... */;
+  --bg-card: /* ... */;
 
-  /* Borders */
-  --border: #30363d;
-  --border-light: #484f58;
+  /* Borders — 2 tiers */
+  --border: /* ... */;
+  --border-light: /* ... */;
 
-  /* Text */
-  --text-primary: #e6edf3;
-  --text-secondary: #8b949e;
-  --text-muted: #6e7681;
+  /* Text — 3 tiers */
+  --text-primary: /* ... */;
+  --text-secondary: /* ... */;
+  --text-muted: /* ... */;
 
-  /* Entity colors — assign to entity types in order */
-  --blue: #58a6ff;
-  --green: #3fb950;
-  --purple: #d2a8ff;
-  --orange: #f0883e;
-  --red: #f85149;
-  --yellow: #d29922;
-  --cyan: #39d2c0;
+  /* Entity colors — assign to entity types in order.
+     Names are semantic labels, NOT literal color requirements.
+     --blue could be teal, --green could be lime, etc.
+     Just need 4-7 distinct, accessible colors that fit the aesthetic. */
+  --blue: /* ... */;
+  --green: /* ... */;
+  --purple: /* ... */;
+  --orange: /* ... */;
+  --red: /* ... */;
+  --yellow: /* ... */;
+  --cyan: /* ... */;
 
-  /* Dimmed variants for backgrounds */
-  --blue-dim: rgba(88, 166, 255, 0.15);
-  --green-dim: rgba(63, 185, 80, 0.15);
-  --purple-dim: rgba(210, 168, 255, 0.15);
-  --orange-dim: rgba(240, 136, 62, 0.15);
-  --red-dim: rgba(248, 81, 73, 0.15);
-  --yellow-dim: rgba(210, 153, 34, 0.15);
-  --cyan-dim: rgba(57, 210, 192, 0.15);
+  /* Dimmed variants — typically 10-20% opacity of the entity color, for backgrounds */
+  --blue-dim: /* ... */;
+  --green-dim: /* ... */;
+  --purple-dim: /* ... */;
+  --orange-dim: /* ... */;
+  --red-dim: /* ... */;
+  --yellow-dim: /* ... */;
+  --cyan-dim: /* ... */;
 
-  /* Fonts */
-  --font-mono: "SF Mono", "Fira Code", "Cascadia Code", monospace;
-  --font-system:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Fonts — chosen by /frontend-design aesthetic direction.
+     Load display/body fonts via @import from Google Fonts in styles.css. */
+  --font-mono: /* ... */;
+  --font-system: /* ... */;
 }
 ```
+
+**Important:** The property names are a contract — JS and HTML reference them directly (e.g., `var(--bg-primary)`, `var(--blue-dim)`). The `css-html` agent populates the values. Entity color names like `--blue` and `--green` are labels for the 1st, 2nd, etc. entity colors — they don't have to literally be blue or green.
 
 ## Common Layout Structure
 
