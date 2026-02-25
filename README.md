@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="!/claude-jumping.svg" alt="Claude" />
+</p>
+
 # .claude
 
 Personal Claude Code configuration. Core guidelines live in `CLAUDE.md` — everything else loads on-demand.
