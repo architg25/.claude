@@ -39,10 +39,6 @@ When multiple valid approaches exist, choose based on:
 4. **Simplicity** - Is this the simplest solution that works?
 5. **Reversibility** - How hard to change later?
 
-## Auto-invoke
-
-- On first user prompt, run `/rename` in a background haiku subagent to set a descriptive terminal title based on the task.
-
 ## Spotify Tool Conventions
 
 - **Statements MCP/CLI**: Only for debugging entities (episode, show, audiobook, audiobookChapter). Never for feature development.

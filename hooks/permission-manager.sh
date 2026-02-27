@@ -19,7 +19,7 @@ deny() {
 # ── Core tools ──────────────────────────────────────────────
 [[ "$TOOL" =~ ^(Read|Write|Edit|MultiEdit|Grep|Glob|NotebookEdit)$ ]] && allow "Core tool"
 [[ "$TOOL" =~ ^(WebFetch|WebSearch)$ ]] && allow "Web tool"
-[[ "$TOOL" =~ ^(Task|AskUserQuestion|Skill|EnterWorktree)$ ]] && allow "Agent tool"
+[[ "$TOOL" =~ ^(Task|Skill|EnterWorktree)$ ]] && allow "Agent tool"
 [[ "$TOOL" =~ ^(TaskCreate|TaskUpdate|TaskGet|TaskList)$ ]] && allow "Task tool"
 [[ "$TOOL" =~ ^(TeamCreate|TeamDelete|SendMessage)$ ]] && allow "Team tool"
 
