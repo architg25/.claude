@@ -1,6 +1,6 @@
 ---
 name: interactive-code-map
-description: Invoke when a user asks to "create a code map", "visualize the pipeline", "interactive flow diagram", "debug flow visualization", or wants to understand how data flows through a codebase component. Generates a multi-file HTML playground with pipeline visualization, step-by-step flow tracer, output format comparison, change impact analysis, and FAQ.
+description: Invoke when a user asks to "create a code map", "visualize the pipeline", "interactive flow diagram", "debug flow visualization", or wants to understand how data flows through a codebase component. Generates a single self-contained HTML file with pipeline visualization, step-by-step flow tracer, interactive scenario simulator, change impact analysis, and FAQ.
 color: purple
 ---
 
@@ -229,6 +229,47 @@ These are non-negotiable for the output:
 - **Data-driven rendering** — all content lives in JS objects, rendering functions consume them
 - **Navigable class names** — clicking a class name shows a popup with file path, methods, and responsibility
 - **Entity type buttons** — toggle buttons in the toolbar that affect ALL tabs (highlighting, filtering, auto-expanding relevant sections)
+- **Scrollable page** — use `min-height: 100vh` not `height: 100vh` on the app container, `overflow: auto` on body not `overflow: hidden`. Content should never be trapped in a fixed viewport.
+- **Scoped scenario bar** — the scenario bar and custom input panel should only be visible on tabs that use them (Pipeline, Flow Tracer). Hide them on static tabs (Architecture, Impact, FAQ) to avoid confusion.
+- **Compact input panels** — when adding configurable inputs, use sub-grids, tight spacing (2px row padding), small toggles (30x16), and 11px font to minimize vertical footprint. The panel should never push the main visualization below the fold.
+
+---
+
+## Scenario Simulation
+
+When the code map visualizes decision logic, routing rules, or policy evaluation (not just data pipelines), include an **interactive scenario simulator**. This is the most valuable feature for understanding "what happens when X?"
+
+### Preset Scenarios
+
+Define 4-8 preset scenarios covering common cases (e.g., "Adult + Explicit Track", "Child + Age-Restricted Content"). Each preset is a JS object with:
+
+- Input attributes (user, content, device, etc.)
+- Pre-computed results (stage outcomes, rule chain, deny reasons, treatments)
+- A descriptive name shown as a pill button in the scenario bar
+
+### Custom Mode
+
+Add a **"Custom"** button that opens a configurable input panel with controls for all relevant attributes:
+
+- **Toggles** for boolean flags
+- **Dropdowns** for enums
+- **Number inputs** for numeric values
+- **Action selector** (if the component has multiple action types)
+
+### Client-Side Evaluation Engine
+
+Implement a JS function that evaluates the full rule/decision chain based on custom inputs:
+
+- Mirrors the real evaluation logic (same rules, same order, same short-circuit behavior)
+- **Every rule must be fully functional** — never stub rules as "simplified" or "always pass". If a rule needs an input that isn't in the panel, add the input.
+- Returns a scenario object matching the preset schema so it plugs into existing rendering
+- Shows a result badge (ALLOW/DENY/treatments) in the input panel
+
+### Input Panel Behavior
+
+- **Presets populate the input panel** — selecting a preset fills in all inputs with that scenario's values, so users can see what drives the result and tweak individual values
+- **Any input change triggers re-evaluation** — no separate "Evaluate" button needed. Modifying a value from a preset auto-switches to custom mode
+- **Live updates** — pipeline and flow tracer re-render immediately on every change
 
 ## Adapting to Different Domains
 
