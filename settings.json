@@ -19,6 +19,16 @@
             "command": "~/.claude/hooks/session-context.sh"
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
+            "timeout": 3
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -28,6 +38,16 @@
           {
             "type": "command",
             "command": "bash ~/.claude/hooks/security-block.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
+            "timeout": 3
           }
         ]
       }
@@ -41,6 +61,16 @@
             "command": "bash ~/.claude/hooks/permission-manager.sh"
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
+            "timeout": 3
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -50,6 +80,16 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/auto-format.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
+            "timeout": 3
           }
         ]
       }
@@ -63,6 +103,16 @@
             "command": "~/.claude/hooks/long-task-notify.sh"
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
+            "timeout": 3
+          }
+        ]
       }
     ],
     "Notification": [
@@ -72,6 +122,54 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/long-task-notify.sh"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
+            "timeout": 3
           }
         ]
       }
