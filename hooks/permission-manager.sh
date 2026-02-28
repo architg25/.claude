@@ -26,6 +26,7 @@ deny() {
 # ── Bash commands ───────────────────────────────────────────
 if [[ "$TOOL" == "Bash" ]]; then
   COMMAND=$(jq -r '.tool_input.command' <<< "$INPUT")
+  COMMAND="${COMMAND#"${COMMAND%%[![:space:]]*}"}"  # trim leading whitespace
 
   # Deny
   [[ "$COMMAND" =~ ^bazel\ clean ]] && deny "bazel clean is not allowed"
@@ -46,7 +47,7 @@ if [[ "$TOOL" == "Bash" ]]; then
   [[ "$COMMAND" =~ ^bazel\ run\ (//:format|//tools/importer) ]] && allow "Bazel run"
 
   # Common CLI
-  [[ "$COMMAND" =~ ^(echo|sed|python3|find|awk|fd|cat|head|rg|grep|ls|cd|mkdir|backstagecli)( |$) ]] && allow "CLI tool"
+  [[ "$COMMAND" =~ ^(echo|sed|python3|find|awk|fd|cat|head|rg|grep|ls|cd|mkdir|backstagecli|wc|lsof)( |$) ]] && allow "CLI tool"
 fi
 
 # ── MCP tools ───────────────────────────────────────────────

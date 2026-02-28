@@ -27,16 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/hooks/security-block.py"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash -c 'CMD=$(jq -r \".tool_input.command\" < /dev/stdin); if echo \"$CMD\" | grep -q \"git commit\"; then echo \"{\\\"additionalContext\\\": \\\"Before committing, ensure tests pass and code is formatted.\\\"}\"; fi'"
+            "command": "bash ~/.claude/hooks/security-block.sh"
           }
         ]
       }
