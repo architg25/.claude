@@ -18,9 +18,11 @@ You are a code map generator. Your job is to explore a codebase component and pr
 
 ## Resources
 
-| Resource         | Path                                         | Use when                  |
-| ---------------- | -------------------------------------------- | ------------------------- |
-| Tab patterns ref | @shared/interactive-code-map/tab-patterns.md | Building the 5 tab panels |
+| Resource         | Path                                                              | Use when                                                                                |
+| ---------------- | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Tab patterns ref | @shared/interactive-code-map/tab-patterns.md                      | Building the 5 tab panels                                                               |
+| CSS patterns     | skills/visual-explainer/references/css-patterns.md                | Depth tiers, background atmosphere, card patterns, code blocks, overflow protection     |
+| Style guide      | skills/visual-explainer/SKILL.md (Style + Anti-Patterns sections) | Font pairings, palette suggestions, aesthetic directions, forbidden patterns, slop test |
 
 ---
 
@@ -119,8 +121,19 @@ Read @shared/interactive-code-map/tab-patterns.md before starting this phase —
 
 **Instructions:**
 
-1. **Invoke the `/frontend-design` skill** to establish the aesthetic direction for this code map. The component's domain and purpose should inform the tone (e.g., a financial pipeline might warrant a refined/editorial feel, a real-time event processor might call for something more industrial/utilitarian, a music metadata pipeline might go playful).
-2. Using that aesthetic direction, build two files:
+1. **Read the visual-explainer styling references** before making any aesthetic decisions:
+   - Read `skills/visual-explainer/references/css-patterns.md` for depth tiers, background atmosphere, card patterns, overflow protection
+   - Read the Style section (§3) and Anti-Patterns section of `skills/visual-explainer/SKILL.md` for font pairings, palettes, aesthetic directions, and the slop test
+2. **Invoke the `/frontend-design` skill** to establish the aesthetic direction for this code map. The component's domain and purpose should inform the tone (e.g., a financial pipeline might warrant a refined/editorial feel, a real-time event processor might call for something more industrial/utilitarian, a music metadata pipeline might go playful).
+3. Using that aesthetic direction **plus the visual-explainer constraints**, build two files:
+
+**Styling constraints (non-negotiable):**
+
+- **Forbidden fonts as body:** Inter, Roboto, Arial, Helvetica, system-ui alone
+- **Forbidden accents:** indigo/violet range (`#8b5cf6`, `#7c3aed`, `#a78bfa`), cyan+magenta+pink neon
+- **Forbidden effects:** gradient text on headings, animated glowing box-shadows, emoji section headers, three-dot window chrome on code blocks
+- **Required:** distinctive font pairing from the visual-explainer list (DM Sans + Fira Code, Instrument Serif + JetBrains Mono, IBM Plex Sans + IBM Plex Mono, etc.), depth-tiered surfaces (hero/elevated/default/recessed), atmospheric backgrounds (subtle gradients or patterns, not flat), visual weight hierarchy (hero sections dominate, reference sections stay compact)
+- **The slop test:** if you replaced the styling with a generic dark theme and nobody would notice, push the aesthetic further
 
 **`styles.css`** — Complete stylesheet:
 
@@ -128,7 +141,7 @@ Read @shared/interactive-code-map/tab-patterns.md before starting this phase —
 - Typography loaded via `@import` from Google Fonts (the one allowed external dependency)
 - Toolbar, tab bar, tab panel, pipeline, tracer, comparison, impact, and FAQ component styles
 - Responsive layout using CSS grid/flexbox
-- Animations and micro-interactions per `/frontend-design` direction
+- Animations: staggered fade-ins on load, purposeful hover transitions. No pulsing/breathing/continuous glow animations. Respect `prefers-reduced-motion`.
 
 **`skeleton.html`** — HTML structure:
 
