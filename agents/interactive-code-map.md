@@ -199,6 +199,7 @@ Read @shared/interactive-code-map/tab-patterns.md before starting this phase —
    - Add `<script src="core.js"></script>` and `<script src="analysis.js"></script>` before `</body>`
    - Add initialization: `<script>document.addEventListener('DOMContentLoaded', init)</script>` after the JS includes
 7. Verify no unexpected external dependencies (only allowed: Google Fonts `@import` in CSS)
+8. **Validate file separation** — open `code-map/index.html` and verify it contains zero `<style>` tags and zero `<script>` tags with more than one line of code (the DOMContentLoaded init is the only allowed inline script). If the file contains inlined CSS or JS, extract them back into the proper files.
 
 ---
 
@@ -233,7 +234,7 @@ Delete the `<component-path>/.claude/codemap-work/` directory after the final fi
 
 These are non-negotiable for the output:
 
-- **Multi-file output in `code-map/` folder** — `index.html`, `styles.css`, `core.js`, `analysis.js`
+- **Multi-file output in `code-map/` folder** — `index.html`, `styles.css`, `core.js`, `analysis.js`. The `index.html` MUST contain only HTML markup with `<link>` and `<script>` tags — no `<style>` blocks, no inline `<script>` blocks beyond the single DOMContentLoaded init call. If the assembler inlines CSS or JS into index.html, the output is invalid.
 - **No external JS dependencies** — vanilla JS only, no frameworks, no build tools
 - **One allowed external CSS dependency** — Google Fonts (or similar) via `@import` for typography
 - **Aesthetic direction via `/frontend-design`** — each code map should feel designed for its domain, not stamped from a generic template
@@ -248,6 +249,31 @@ These are non-negotiable for the output:
 
 ---
 
+## Code Size Budget
+
+Output files should stay lean. Target sizes (not hard limits, but triggers for review):
+
+| File          | Target  | If over, review for                             |
+| ------------- | ------- | ----------------------------------------------- |
+| `core.js`     | 400 LOC | Duplicated rendering, hand-built HTML           |
+| `analysis.js` | 300 LOC | Duplicated rendering, verbose template literals |
+| `styles.css`  | 500 LOC | Redundant selectors, unused rules               |
+| `index.html`  | 80 LOC  | Inlined CSS/JS (must be 0), excessive markup    |
+
+### Anti-Bloat Rules
+
+1. **No hand-positioned SVG coordinates in data arrays.** Node positions must be computed by a layout function, not hardcoded as `x: 472, y: 208`. Data arrays contain only logical relationships (which nodes, which edges, which groups). The rendering function computes coordinates.
+
+2. **Use the shared utility functions.** `badge()`, `detailRow()`, `card()`, `table()`, `classRef()`, `sectionHeading()` exist in `tab-patterns.md`. If a render function builds a badge with a raw template literal instead of calling `badge()`, it violates this rule.
+
+3. **Scenario presets store inputs only.** Never duplicate computed results (`ruleChain`, `stageResults`, `treatments`) in preset data. The evaluation engine derives these at init.
+
+4. **One rendering pattern per visual element.** If badges appear in 3 tabs, there is one `badge()` call, not 3 different template literal patterns that produce similar-looking badges.
+
+5. **DRY threshold: 3 occurrences.** If a template literal pattern appears 3+ times across render functions, extract it as a shared utility in `core.js`.
+
+---
+
 ## Scenario Simulation
 
 When the code map visualizes decision logic, routing rules, or policy evaluation (not just data pipelines), include an **interactive scenario simulator**. This is the most valuable feature for understanding "what happens when X?"
@@ -256,9 +282,25 @@ When the code map visualizes decision logic, routing rules, or policy evaluation
 
 Define 4-8 preset scenarios covering common cases (e.g., "Adult + Explicit Track", "Child + Age-Restricted Content"). Each preset is a JS object with:
 
-- Input attributes (user, content, device, etc.)
-- Pre-computed results (stage outcomes, rule chain, deny reasons, treatments)
-- A descriptive name shown as a pill button in the scenario bar
+- `name` — descriptive label shown as a pill button in the scenario bar
+- `user`, `content`, `action` — input attributes only (same shape as the custom input panel)
+
+**Presets store inputs only, never pre-computed results.** The evaluation engine computes `ruleChain`, `stageResults`, `denyReason`, `treatments`, and `finalDecision` from the inputs at init time. This means one source of truth for evaluation logic, presets are ~3 lines each instead of ~20, and adding a new rule automatically updates all preset results.
+
+```js
+// CORRECT: inputs only, results derived at init
+const SCENARIOS = [
+  { name: 'Adult + Explicit Track', user: { age: 25, ... }, content: { is_explicit: true, ... }, action: 'VIEW' },
+];
+// At init: SCENARIOS.forEach(s => Object.assign(s, evaluate(s.user, s.content, s.action)));
+
+// WRONG: duplicating what evaluate() already computes
+const SCENARIOS = [
+  { name: 'Adult + Explicit Track', user: { ... }, content: { ... },
+    ruleChain: [ /* 10+ objects that evaluate() would return */ ],
+    stageResults: [ /* 8 values */ ], finalDecision: 'ALLOW', ... },
+];
+```
 
 ### Custom Mode
 

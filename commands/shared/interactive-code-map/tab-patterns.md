@@ -149,6 +149,56 @@ function showClassInfo(name) {
 }
 ```
 
+### DOM/HTML Builder Utilities (shared across all tabs)
+
+Every render function should use these helpers instead of raw template literals. They compress repetitive card/badge/table/detail patterns into single calls.
+
+```js
+// Badge: colored label chip
+function badge(text, color) {
+  return `<span class="badge" style="--badge-color:var(--${color})">${text}</span>`;
+}
+
+// Detail row: label + value pair (used in sidebars, lookups, cards)
+function detailRow(label, value) {
+  return `<div class="detail-row"><span class="detail-label">${label}</span><span class="detail-value">${value}</span></div>`;
+}
+
+// Card wrapper: titled container with optional severity/color class
+function card(title, body, cls = "") {
+  return `<div class="card ${cls}"><div class="card-title">${title}</div><div class="card-body">${body}</div></div>`;
+}
+
+// Table from arrays: headers[] + rows[][]
+function table(headers, rows, cls = "") {
+  return `<table class="data-table ${cls}"><thead><tr>${headers
+    .map((h) => `<th>${h}</th>`)
+    .join("")}</tr></thead><tbody>${rows
+    .map((r) => `<tr>${r.map((c) => `<td>${c}</td>`).join("")}</tr>`)
+    .join("")}</tbody></table>`;
+}
+
+// Code reference: clickable class name
+function classRef(name) {
+  return `<code class="nav-link" onclick="showClassInfo('${name}')">${name}</code>`;
+}
+
+// Section heading with optional count badge
+function sectionHeading(text, count) {
+  return `<div class="section-heading">${text}${count != null ? ` <span class="count-badge">${count}</span>` : ""}</div>`;
+}
+```
+
+**Required CSS classes** (the `css-html` agent must define these alongside the custom property contract):
+
+- `.badge` — inline pill with `background: color-mix(in srgb, var(--badge-color) 15%, transparent)`, `color: var(--badge-color)`, small font, border-radius
+- `.detail-row` — flexbox row with `.detail-label` (uppercase, muted, fixed width) and `.detail-value`
+- `.card` / `.card-title` / `.card-body` — bordered surface with title bar, uses `--bg-card`
+- `.data-table` — styled table matching the aesthetic (sticky thead, alternating rows, hover highlight)
+- `.section-heading` / `.count-badge` — heading with optional pill count
+
+**Rule:** Render functions MUST use these utilities for common patterns. If a render function hand-builds a badge, card, detail row, or table with a raw template literal, it violates this rule. If a pattern appears in 2+ tabs, extract it here.
+
 ---
 
 ## Tab 1: Pipeline
@@ -636,6 +686,69 @@ function toggleFaqAccordion(id) {
 ### Entity Highlighting
 
 When an entity is toggled, FAQ sections tagged with `data-entity` attributes get highlighted/dimmed.
+
+---
+
+## Tab 6: Architecture (when class structure warrants it)
+
+Class/module dependency diagram with clickable nodes and a detail sidebar. Only include this tab when the component has 5+ classes with non-trivial dependency relationships. For simpler components, the Pipeline tab is sufficient.
+
+### HTML Skeleton
+
+```html
+<div id="tab-arch" class="tab-panel" style="flex-direction: row;">
+  <div class="arch-diagram-container">
+    <svg id="arch-svg"></svg>
+  </div>
+  <div class="arch-sidebar" id="arch-sidebar">
+    <!-- Class cards built by JS using card() + detailRow() utilities -->
+  </div>
+</div>
+```
+
+### JS Data Structures
+
+```js
+// Architecture nodes — same data-driven pattern as pipelineSteps[]
+const archNodes = [
+  {
+    id: "class-id",
+    label: "ClassName",
+    subtitle: "interface | class | external",
+    group: "GROUP_NAME",
+    color: "--accent", // CSS var name for stroke color
+    classIdx: 0, // index into classInfo{}
+  },
+];
+
+// Architecture edges
+const archEdges = [
+  { from: "class-id-1", to: "class-id-2", style: "solid", label: "" },
+  {
+    from: "class-id-2",
+    to: "class-id-3",
+    style: "dashed",
+    label: "implements",
+  },
+];
+
+// Groups define visual bounding boxes
+const archGroups = [{ id: "GROUP_NAME", label: "Group Title" }];
+```
+
+### Rendering
+
+- `buildArchSVG()` computes layout from `archGroups` / `archNodes` / `archEdges` — **NO hand-positioned coordinates in data**
+- Layout algorithm: group nodes by `group`, stack groups vertically with padding, distribute nodes horizontally within each group, compute bounding rects from node positions
+- Each node is an SVG `<g>` with `<rect>` + `<text>`, clickable via `selectClass(classIdx)`
+- Edges rendered as lines/paths with optional arrowheads (shared marker defs)
+- Group bounding boxes rendered as low-opacity background rects with uppercase title labels
+- Detail sidebar reuses `classInfo{}` data and the `card()` + `detailRow()` utilities
+- Legend rendered from edge styles found in `archEdges`
+
+### Why data-driven matters
+
+Hardcoded SVG with pixel coordinates is fragile (breaks if classes are added/removed) and verbose (~120 lines for a 12-class diagram). Data-driven rendering with auto-layout produces the same visual from ~30 lines of node/edge data + ~40 lines of layout code.
 
 ---
 
