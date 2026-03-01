@@ -83,6 +83,9 @@ fi
 # BigQuery (claude_ai variant)
 [[ "$TOOL" =~ ^mcp__claude_ai_Big_Query_MCP__ ]] && allow "BigQuery"
 
+# GDrive (claude_ai variant)
+[[ "$TOOL" =~ ^mcp__claude_ai_GDrive_MCP__ ]] && allow "GDrive"
+
 # AiKA Search (claude_ai variant)
 [[ "$TOOL" =~ ^mcp__claude_ai_AiKA_Search_MCP__ ]] && allow "AiKA search"
 
