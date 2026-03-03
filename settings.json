@@ -1,64 +1,55 @@
 {
+  "alwaysThinkingEnabled": true,
+  "disableAllHooks": false,
+  "enableAllProjectMcpServers": true,
+  "enabledPlugins": {
+    "feature-dev@claude-code-plugins": false,
+    "pr-review-toolkit@claude-code-plugins": false,
+    "commit-commands@claude-code-plugins": false,
+    "agent-sdk-dev@claude-code-plugins": false,
+    "claude-mem@thedotmack": false,
+    "playground@claude-plugins-official": true,
+    "frontend-design@claude-code-plugins": true,
+    "superpowers@claude-plugins-official": true
+  },
   "env": {
     "model": "claude-opus-4-6[1m]",
     "EDITOR": "zed",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "CLAUDE_NOTIFY_THRESHOLD": "300"
   },
-  "includeCoAuthoredBy": false,
-  "permissions": {},
-  "model": "claude-opus-4-6[1m]",
-  "enableAllProjectMcpServers": true,
   "hooks": {
-    "SessionStart": [
+    "Notification": [
       {
-        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/session-context.sh"
+            "command": "~/.claude/hooks/long-task-notify.sh"
           }
         ]
       },
       {
-        "matcher": "",
+        "matcher": "permission_prompt|elicitation_dialog",
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
-            "timeout": 3
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Bash|Edit|Write|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ~/.claude/hooks/security-block.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
-            "timeout": 3
+            "command": "agent-deck hook-handler",
+            "async": true
           }
         ]
       }
     ],
     "PermissionRequest": [
       {
-        "matcher": "",
         "hooks": [
           {
             "type": "command",
             "command": "bash ~/.claude/hooks/permission-manager.sh"
+          },
+          {
+            "type": "command",
+            "command": "agent-deck hook-handler",
+            "async": true
           }
         ]
       },
@@ -67,7 +58,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
+            "command": "/Users/architg/.local/pipx/venvs/flaude/lib/python3.14/site-packages/flaude/bin/flaude-hook",
             "timeout": 3
           }
         ]
@@ -88,19 +79,19 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
+            "command": "/Users/architg/.local/pipx/venvs/flaude/lib/python3.14/site-packages/flaude/bin/flaude-hook",
             "timeout": 3
           }
         ]
       }
     ],
-    "UserPromptSubmit": [
+    "PreToolUse": [
       {
-        "matcher": "",
+        "matcher": "Bash|Edit|Write|MultiEdit",
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/long-task-notify.sh"
+            "command": "bash ~/.claude/hooks/security-block.sh"
           }
         ]
       },
@@ -109,19 +100,58 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
+            "command": "/Users/architg/.local/pipx/venvs/flaude/lib/python3.14/site-packages/flaude/bin/flaude-hook",
             "timeout": 3
           }
         ]
       }
     ],
-    "Notification": [
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/session-context.sh"
+          },
+          {
+            "type": "command",
+            "command": "agent-deck hook-handler",
+            "async": true
+          }
+        ]
+      },
       {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
+            "command": "/Users/architg/.local/pipx/venvs/flaude/lib/python3.14/site-packages/flaude/bin/flaude-hook",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
             "command": "~/.claude/hooks/long-task-notify.sh"
+          },
+          {
+            "type": "command",
+            "command": "agent-deck hook-handler",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/architg/.local/pipx/venvs/flaude/lib/python3.14/site-packages/flaude/bin/flaude-hook",
+            "timeout": 3
           }
         ]
       }
@@ -132,7 +162,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
+            "command": "/Users/architg/.local/pipx/venvs/flaude/lib/python3.14/site-packages/flaude/bin/flaude-hook",
             "timeout": 3
           }
         ]
@@ -144,7 +174,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
+            "command": "/Users/architg/.local/pipx/venvs/flaude/lib/python3.14/site-packages/flaude/bin/flaude-hook",
             "timeout": 3
           }
         ]
@@ -156,7 +186,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
+            "command": "/Users/architg/.local/pipx/venvs/flaude/lib/python3.14/site-packages/flaude/bin/flaude-hook",
             "timeout": 3
           }
         ]
@@ -168,29 +198,20 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
+            "command": "/Users/architg/.local/pipx/venvs/flaude/lib/python3.14/site-packages/flaude/bin/flaude-hook",
             "timeout": 3
           }
         ]
       }
     ]
   },
-  "disableAllHooks": false,
+  "includeCoAuthoredBy": false,
+  "model": "claude-opus-4-6[1m]",
+  "permissions": {},
   "statusLine": {
     "type": "command",
     "command": "~/.claude/ccline/ccline",
     "padding": 0
   },
-  "enabledPlugins": {
-    "feature-dev@claude-code-plugins": false,
-    "pr-review-toolkit@claude-code-plugins": false,
-    "commit-commands@claude-code-plugins": false,
-    "agent-sdk-dev@claude-code-plugins": false,
-    "claude-mem@thedotmack": false,
-    "playground@claude-plugins-official": true,
-    "frontend-design@claude-code-plugins": true,
-    "superpowers@claude-plugins-official": true
-  },
-  "alwaysThinkingEnabled": true,
   "teammateMode": "tmux"
 }
