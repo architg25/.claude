@@ -10,8 +10,11 @@ Usage:
     python ~/.claude/refresh_mcp_tokens.py --refresh-only   # skip full OAuth
     python ~/.claude/refresh_mcp_tokens.py --dry-run        # just show status
 
-Tip: Auto-refresh on session start by adding to ~/.claude/settings.json:
+Tips:
+  Shell alias (add to ~/.zshrc):
+    alias mcp-refresh='python3 ~/.claude/refresh_mcp_tokens.py'
 
+  Auto-refresh on session start (add to ~/.claude/settings.json):
     "hooks": {
       "SessionStart": [{
         "hooks": [{
@@ -194,18 +197,9 @@ def register_client(entry):
     return result
 
 
-def authorize_server(entry, callback_server):
-    """Full OAuth authorization code flow with PKCE. Returns expires_in seconds."""
-    code_verifier, code_challenge = generate_pkce()
-    auth_url = get_endpoint(entry, "authorization_endpoint")
-    token_url = get_endpoint(entry, "token_endpoint")
-
-    if not auth_url or not token_url:
-        raise RuntimeError("Missing auth/token endpoints")
-
+def _build_auth_params(entry, code_challenge):
     scope = entry.get("scope") or entry.get("stepUpScope") or DEFAULT_SCOPE
-
-    params = {
+    return {
         "client_id": entry["clientId"],
         "redirect_uri": REDIRECT_URI,
         "response_type": "code",
@@ -215,14 +209,9 @@ def authorize_server(entry, callback_server):
         "code_challenge_method": "S256",
     }
 
-    full_url = f"{auth_url}?{urlencode(params)}"
-    callback_server.reset()
-    webbrowser.open(full_url)
 
-    code = callback_server.wait_for_code(timeout=AUTH_TIMEOUT)
-    if not code:
-        raise TimeoutError("No callback received within timeout")
-
+def _exchange_code(entry, code, code_verifier):
+    token_url = get_endpoint(entry, "token_endpoint")
     result = http_post(
         token_url,
         {
@@ -234,7 +223,6 @@ def authorize_server(entry, callback_server):
             "code_verifier": code_verifier,
         },
     )
-
     entry["accessToken"] = result["access_token"]
     if "refresh_token" in result:
         entry["refreshToken"] = result["refresh_token"]
@@ -243,6 +231,46 @@ def authorize_server(entry, callback_server):
     if "scope" in result:
         entry["scope"] = result["scope"]
     return expires_in
+
+
+def authorize_server(entry, callback_server):
+    """Full OAuth authorization code flow with PKCE. Returns expires_in seconds.
+
+    Tries silent auth (prompt=none) first — if the user has an active SSO
+    session, the browser auto-redirects without any interaction. Falls back
+    to interactive browser auth if silent auth fails.
+    """
+    code_verifier, code_challenge = generate_pkce()
+    auth_url = get_endpoint(entry, "authorization_endpoint")
+
+    if not auth_url or not get_endpoint(entry, "token_endpoint"):
+        raise RuntimeError("Missing auth/token endpoints")
+
+    params = _build_auth_params(entry, code_challenge)
+
+    # Try silent auth first (no consent screen, no login screen)
+    silent_params = {**params, "prompt": "none"}
+    callback_server.reset()
+    webbrowser.open(f"{auth_url}?{urlencode(silent_params)}")
+
+    try:
+        code = callback_server.wait_for_code(timeout=10)
+        if code:
+            return _exchange_code(entry, code, code_verifier)
+    except ValueError:
+        # Auth0 returned error (login_required, consent_required, etc.)
+        pass
+
+    # Fall back to interactive browser auth
+    code_verifier, code_challenge = generate_pkce()
+    params = _build_auth_params(entry, code_challenge)
+    callback_server.reset()
+    webbrowser.open(f"{auth_url}?{urlencode(params)}")
+
+    code = callback_server.wait_for_code(timeout=AUTH_TIMEOUT)
+    if not code:
+        raise TimeoutError("No callback received within timeout")
+    return _exchange_code(entry, code, code_verifier)
 
 
 class _CallbackHandler(BaseHTTPRequestHandler):
@@ -405,11 +433,8 @@ def main():
 
     # Phase 2: Full OAuth
     if needs_auth and not refresh_only:
-        print(f"Phase 2: Authenticating {len(needs_auth)} servers via browser...")
-        print(f"  Callback server on {REDIRECT_URI}")
-        print(
-            f"  Your browser will open for each server. SSO should auto-approve most.\n"
-        )
+        print(f"Phase 2: Authenticating {len(needs_auth)} servers...")
+        print(f"  Tries silent auth first; falls back to browser if needed.\n")
 
         try:
             callback = CallbackServer(CALLBACK_PORT)
