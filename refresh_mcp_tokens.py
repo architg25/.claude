@@ -9,6 +9,17 @@ Usage:
     python ~/.claude/refresh_mcp_tokens.py
     python ~/.claude/refresh_mcp_tokens.py --refresh-only   # skip full OAuth
     python ~/.claude/refresh_mcp_tokens.py --dry-run        # just show status
+
+Tip: Auto-refresh on session start by adding to ~/.claude/settings.json:
+
+    "hooks": {
+      "SessionStart": [{
+        "hooks": [{
+          "type": "command",
+          "command": "python3 ~/.claude/refresh_mcp_tokens.py --refresh-only"
+        }]
+      }]
+    }
 """
 
 import base64
