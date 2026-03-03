@@ -111,6 +111,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "python3 ~/.claude/refresh_mcp_tokens.py --refresh-only"
+          },
+          {
+            "type": "command",
             "command": "~/.claude/hooks/session-context.sh"
           },
           {
