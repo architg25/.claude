@@ -27,6 +27,7 @@ deny() {
 if [[ "$TOOL" == "Bash" ]]; then
   COMMAND=$(jq -r '.tool_input.command' <<< "$INPUT")
   COMMAND="${COMMAND#"${COMMAND%%[![:space:]]*}"}"  # trim leading whitespace
+  COMMAND="${COMMAND#GH_HOST=ghe.spotify.net }"     # strip GH_HOST prefix
 
   # Deny
   [[ "$COMMAND" =~ ^bazel\ clean ]] && deny "bazel clean is not allowed"
