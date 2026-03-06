@@ -33,7 +33,7 @@ if [[ "$TOOL" == "Bash" ]]; then
   [[ "$COMMAND" =~ ^bazel\ clean ]] && deny "bazel clean is not allowed"
 
   # Git
-  [[ "$COMMAND" =~ ^git\ (status|log|diff|branch|show|fetch|checkout|pull|push|add|commit|cherry-pick|remote|stash|rev-parse|rebase) ]] && allow "Git"
+  [[ "$COMMAND" =~ ^git\ (-[a-zA-Z]\ [^ ]+\ )*(status|log|diff|branch|show|fetch|checkout|pull|add|commit|cherry-pick|remote|stash|rev-parse|rebase) ]] && allow "Git"
 
   # GitHub CLI
   [[ "$COMMAND" =~ ^gh\ pr\ (list|view|checks|diff|create|ready|review) ]] && allow "GitHub CLI"
