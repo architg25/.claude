@@ -32,7 +32,7 @@
 ## Code Intelligence
 
 If using gh, the default is and should be GH_HOST=ghe.spotify.net, but if I give you github links
-switch the GH_HOST=github.com only for that.    
+switch the GH_HOST=github.com only for that.
 
 ## Decision Framework
 
@@ -48,6 +48,7 @@ When multiple valid approaches exist, choose based on:
 
 **NEVER**:
 
+- Use `find`, `ls`, `grep`, `cat`, `head`, `tail`, `sed`, `awk`, `echo >` via Bash - use dedicated tools (Glob, Grep, Read, Edit, Write) instead
 - Bypass commit hooks or disable tests
 - Make assumptions - verify with existing code
 

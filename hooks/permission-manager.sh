@@ -32,6 +32,8 @@ if [[ "$TOOL" == "Bash" ]]; then
 
   # Deny
   [[ "$COMMAND" =~ ^bazel\ clean ]] && deny "bazel clean is not allowed"
+  [[ "$COMMAND" =~ ^(find|ls|grep|rg|cat|head|tail|sed|awk)( |$) ]] && deny "Use dedicated tools (Glob, Grep, Read, Edit) instead"
+  [[ "$COMMAND" =~ ^echo\ .*\> ]] && deny "Use Write tool instead of echo redirection"
 
   # Git
   [[ "$COMMAND" =~ ^git\ (-[a-zA-Z]\ [^ ]+\ )*(status|log|diff|branch|show|fetch|checkout|pull|add|commit|cherry-pick|remote|stash|rev-parse|rebase) ]] && allow "Git"
@@ -55,7 +57,7 @@ if [[ "$TOOL" == "Bash" ]]; then
   [[ "$COMMAND" =~ ^cargo\ (build|test|check|clippy|fmt|run|bench|doc|clean|update|add|remove|tree|fix|search|version|metadata|generate-lockfile)( |$) ]] && allow "Cargo"
 
   # Common CLI
-  [[ "$COMMAND" =~ ^(echo|sed|python3|find|awk|fd|cat|head|rg|grep|ls|cd|mkdir|backstagecli|wc|lsof|ps|gofmt|tail|jq)( |$) ]] && allow "CLI tool"
+  [[ "$COMMAND" =~ ^(python3|fd|cd|mkdir|backstagecli|wc|lsof|ps|gofmt|jq)( |$) ]] && allow "CLI tool"
 fi
 
 # ── MCP tools ───────────────────────────────────────────────
