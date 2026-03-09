@@ -2,8 +2,7 @@
   "env": {
     "model": "claude-opus-4-6[1m]",
     "EDITOR": "zed",
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "CLAUDE_NOTIFY_THRESHOLD": "300"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "includeCoAuthoredBy": false,
   "permissions": {},
@@ -11,14 +10,6 @@
   "enableAllProjectMcpServers": true,
   "hooks": {
     "Notification": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/long-task-notify.sh"
-          }
-        ]
-      },
       {
         "matcher": "permission_prompt|elicitation_dialog",
         "hooks": [
@@ -125,10 +116,6 @@
     "UserPromptSubmit": [
       {
         "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/long-task-notify.sh"
-          },
           {
             "type": "command",
             "command": "agent-deck hook-handler",
