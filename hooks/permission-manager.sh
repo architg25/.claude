@@ -28,6 +28,7 @@ if [[ "$TOOL" == "Bash" ]]; then
   COMMAND=$(jq -r '.tool_input.command' <<< "$INPUT")
   COMMAND="${COMMAND#"${COMMAND%%[![:space:]]*}"}"  # trim leading whitespace
   COMMAND="${COMMAND#GH_HOST=ghe.spotify.net }"     # strip GH_HOST prefix
+  COMMAND="${COMMAND#GH_HOST=github.com }"          # strip GH_HOST prefix (public GitHub)
 
   # Deny
   [[ "$COMMAND" =~ ^bazel\ clean ]] && deny "bazel clean is not allowed"
@@ -36,7 +37,7 @@ if [[ "$TOOL" == "Bash" ]]; then
   [[ "$COMMAND" =~ ^git\ (-[a-zA-Z]\ [^ ]+\ )*(status|log|diff|branch|show|fetch|checkout|pull|add|commit|cherry-pick|remote|stash|rev-parse|rebase) ]] && allow "Git"
 
   # GitHub CLI
-  [[ "$COMMAND" =~ ^gh\ pr\ (list|view|checks|diff|create|ready|review) ]] && allow "GitHub CLI"
+  [[ "$COMMAND" =~ ^gh\ pr\ (list|view|checks|diff|create|ready|review|comment) ]] && allow "GitHub CLI"
   [[ "$COMMAND" =~ ^gh\ (api|issue|run) ]] && allow "GitHub CLI"
 
   # Maven
@@ -47,8 +48,14 @@ if [[ "$TOOL" == "Bash" ]]; then
   [[ "$COMMAND" =~ ^bazel\ (build|cquery|query|test) ]] && allow "Bazel"
   [[ "$COMMAND" =~ ^bazel\ run\ (//:format|//tools/importer) ]] && allow "Bazel run"
 
+  # Go
+  [[ "$COMMAND" =~ ^go\ (build|test|vet|fmt|mod|list|doc|version|env|generate|tool|run|get|install|clean|work)( |$) ]] && allow "Go"
+
+  # Cargo (Rust)
+  [[ "$COMMAND" =~ ^cargo\ (build|test|check|clippy|fmt|run|bench|doc|clean|update|add|remove|tree|fix|search|version|metadata|generate-lockfile)( |$) ]] && allow "Cargo"
+
   # Common CLI
-  [[ "$COMMAND" =~ ^(echo|sed|python3|find|awk|fd|cat|head|rg|grep|ls|cd|mkdir|backstagecli|wc|lsof)( |$) ]] && allow "CLI tool"
+  [[ "$COMMAND" =~ ^(echo|sed|python3|find|awk|fd|cat|head|rg|grep|ls|cd|mkdir|backstagecli|wc|lsof|ps|gofmt|tail|jq)( |$) ]] && allow "CLI tool"
 fi
 
 # ── MCP tools ───────────────────────────────────────────────

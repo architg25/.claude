@@ -29,6 +29,11 @@
 - **Learn from mistakes** - Update `tasks/lessons.md` after user corrections
 - **Prove it works before marking done**
 
+## Code Intelligence
+
+If using gh, the default is and should be GH_HOST=ghe.spotify.net, but if I give you github links
+switch the GH_HOST=github.com only for that.    
+
 ## Decision Framework
 
 When multiple valid approaches exist, choose based on:
@@ -38,11 +43,6 @@ When multiple valid approaches exist, choose based on:
 3. **Consistency** - Does this match project patterns?
 4. **Simplicity** - Is this the simplest solution that works?
 5. **Reversibility** - How hard to change later?
-
-## Spotify Tool Conventions
-
-- **Statements MCP/CLI**: Only for debugging entities (episode, show, audiobook, audiobookChapter). Never for feature development.
-- **Jira**: Default project is CONACCESS. Always hyperlink tickets with URL and show current status.
 
 ## Important Reminders
 
