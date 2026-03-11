@@ -1,13 +1,26 @@
 {
+  "alwaysThinkingEnabled": true,
+  "disableAllHooks": false,
+  "enableAllProjectMcpServers": true,
+  "enabledPlugins": {
+    "playground@claude-plugins-official": true,
+    "frontend-design@claude-code-plugins": true,
+    "document-skills@anthropic-agent-skills": true,
+    "superpowers@claude-plugins-official": true
+  },
   "env": {
     "model": "claude-opus-4-6[1m]",
     "EDITOR": "zed",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
-  "includeCoAuthoredBy": false,
-  "permissions": {},
-  "model": "claude-opus-4-6[1m]",
-  "enableAllProjectMcpServers": true,
+  "extraKnownMarketplaces": {
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    }
+  },
   "hooks": {
     "Notification": [
       {
@@ -36,12 +49,10 @@
         ]
       },
       {
-        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
-            "timeout": 3
+            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook"
           }
         ]
       }
@@ -67,6 +78,20 @@
         ]
       }
     ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook"
+          },
+          {
+            "type": "command",
+            "command": "agent-deck hook-handler"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash|Edit|Write|MultiEdit",
@@ -78,12 +103,31 @@
         ]
       },
       {
+        "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "dippy" }]
+      },
+      {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
             "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
             "timeout": 3
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook"
+          },
+          {
+            "type": "command",
+            "command": "agent-deck hook-handler",
+            "async": true
           }
         ]
       }
@@ -102,6 +146,31 @@
           }
         ]
       },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook"
+          },
+          {
+            "type": "command",
+            "command": "agent-deck hook-handler",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
       {
         "matcher": "",
         "hooks": [
@@ -124,85 +193,22 @@
         ]
       },
       {
-        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
-            "timeout": 3
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
-            "timeout": 3
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
-            "timeout": 3
-          }
-        ]
-      }
-    ],
-    "SubagentStop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
-            "timeout": 3
-          }
-        ]
-      }
-    ],
-    "PreCompact": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
-            "timeout": 3
+            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook"
           }
         ]
       }
     ]
   },
-  "disableAllHooks": false,
+  "includeCoAuthoredBy": false,
+  "model": "claude-opus-4-6[1m]",
+  "permissions": {},
   "statusLine": {
     "type": "command",
     "command": "~/.claude/ccline/ccline",
     "padding": 0
   },
-  "enabledPlugins": {
-    "playground@claude-plugins-official": true,
-    "frontend-design@claude-code-plugins": true,
-    "document-skills@anthropic-agent-skills": true,
-    "superpowers@claude-plugins-official": true
-  },
-  "extraKnownMarketplaces": {
-    "anthropic-agent-skills": {
-      "source": {
-        "source": "github",
-        "repo": "anthropics/skills"
-      }
-    }
-  },
-  "alwaysThinkingEnabled": true,
   "teammateMode": "tmux"
 }

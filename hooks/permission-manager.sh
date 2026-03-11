@@ -60,44 +60,19 @@ if [[ "$TOOL" == "Bash" ]]; then
   [[ "$COMMAND" =~ ^(python3|fd|cd|mkdir|backstagecli|wc|lsof|ps|gofmt|jq)( |$) ]] && allow "CLI tool"
 fi
 
-# ── MCP tools ───────────────────────────────────────────────
+# ── MCP tools (read-only only) ─────────────────────────────
 [[ "$TOOL" =~ ^mcp__code-search__ ]]          && allow "Code search"
-[[ "$TOOL" =~ ^mcp__aika-search__ ]]          && allow "AiKA search"
-[[ "$TOOL" =~ ^mcp__sequential-thinking__ ]]   && allow "Thinking"
 [[ "$TOOL" =~ ^mcp__context7__ ]]             && allow "Context7"
 [[ "$TOOL" =~ ^mcp__cloud-logging-mcp__ ]]    && allow "Cloud logging"
 [[ "$TOOL" =~ ^mcp__context-mcp__ ]]          && allow "Context MCP"
-[[ "$TOOL" =~ ^mcp__o11y-agg-mcp__ ]]         && allow "O11y"
-[[ "$TOOL" =~ ^mcp__backstage-mcp-actions__ ]] && allow "Backstage"
-[[ "$TOOL" =~ ^mcp__bigquery-mcp__ ]]         && allow "BigQuery"
-[[ "$TOOL" =~ ^mcp__groove-mcp__ ]]           && allow "Groove"
-[[ "$TOOL" =~ ^mcp__google-drive-mcp__ ]]     && allow "Google Drive"
+[[ "$TOOL" =~ ^mcp__ide__ ]]                  && allow "IDE diagnostics"
 
-[[ "$TOOL" =~ ^mcp__plugin_claude-mem_claude-mem-search__ ]] && allow "Claude memory"
-
-# Atlassian - read-only operations
-[[ "$TOOL" =~ ^mcp__atlassian-mcp__(list_tickets|get_project_info|search_issues_advanced|get_available_transitions)$ ]] && allow "Jira read"
-
-# Google Calendar - read-only operations
-[[ "$TOOL" =~ ^mcp__google-calendar-mcp__(list_calendar_events|get_calendar_event|list_calendars)$ ]] && allow "Calendar read"
-
-# Spotify Enterprise Context Agent
-[[ "$TOOL" =~ ^mcp__claude_ai_Spotify_s_Enterprise_Context_Agent__ ]] && allow "Enterprise Context"
-
-# Slack tools
-[[ "$TOOL" =~ ^mcp__claude_ai_Slack__ ]] && allow "Slack"
-
-# Bandmanager
-[[ "$TOOL" =~ ^mcp__claude_ai_Bandmanager_MCP__ ]] && allow "Bandmanager"
-
-# BigQuery (claude_ai variant)
-[[ "$TOOL" =~ ^mcp__claude_ai_Big_Query_MCP__ ]] && allow "BigQuery"
-
-# GDrive (claude_ai variant)
-[[ "$TOOL" =~ ^mcp__claude_ai_GDrive_MCP__ ]] && allow "GDrive"
-
-# AiKA Search (claude_ai variant)
+# claude_ai MCP servers
 [[ "$TOOL" =~ ^mcp__claude_ai_AiKA_Search_MCP__ ]] && allow "AiKA search"
+[[ "$TOOL" =~ ^mcp__claude_ai_Big_Query_MCP__ ]]   && allow "BigQuery"
+[[ "$TOOL" =~ ^mcp__claude_ai_GDrive_MCP__ ]]      && allow "GDrive"
+[[ "$TOOL" =~ ^mcp__claude_ai_Slack__slack_(read|search) ]] && allow "Slack read"
+[[ "$TOOL" =~ ^mcp__sequential-thinking__ ]]        && allow "Sequential thinking"
 
 # EnterPlanMode (agent workflow)
 [[ "$TOOL" == "EnterPlanMode" ]] && allow "Plan mode"
