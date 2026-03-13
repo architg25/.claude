@@ -39,10 +39,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/.claude/hooks/permission-manager.sh"
-          },
-          {
-            "type": "command",
             "command": "agent-deck hook-handler",
             "async": true
           }
@@ -103,7 +99,7 @@
         ]
       },
       {
-        "matcher": "Bash",
+        "matcher": "Bash|mcp__.*",
         "hooks": [{ "type": "command", "command": "dippy" }]
       },
       {
@@ -204,7 +200,29 @@
   },
   "includeCoAuthoredBy": false,
   "model": "claude-opus-4-6[1m]",
-  "permissions": {},
+  "permissions": {
+    "allow": [
+      "Read",
+      "Write",
+      "Edit",
+      "MultiEdit",
+      "Grep",
+      "Glob",
+      "NotebookEdit",
+      "WebFetch",
+      "WebSearch",
+      "Skill",
+      "EnterWorktree",
+      "EnterPlanMode",
+      "TaskCreate",
+      "TaskUpdate",
+      "TaskGet",
+      "TaskList",
+      "TeamCreate",
+      "TeamDelete",
+      "SendMessage"
+    ]
+  },
   "statusLine": {
     "type": "command",
     "command": "~/.claude/ccline/ccline",

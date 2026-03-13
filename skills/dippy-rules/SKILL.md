@@ -15,8 +15,9 @@ Each line in the config is one rule:
 <action> <command-prefix> ["optional message"]
 ```
 
-- **action**: `allow`, `deny`, or `ask`
+- **action**: `allow`, `deny`, or `ask` for Bash commands; `allow-mcp`, `deny-mcp`, or `ask-mcp` for MCP tools
 - **command-prefix**: Matches the command and anything after it (e.g. `git` matches `git commit`, `git push`, etc.)
+- **MCP pattern**: For MCP rules, use the tool name pattern with `*` wildcards (e.g. `mcp__github__get_*`)
 - **message** (optional, quoted): Shown to the user when the rule triggers. Most useful with `deny`.
 - Lines starting with `#` are comments.
 
@@ -47,3 +48,9 @@ Action: Delete the `allow git` line from config
 
 User: "what are my dippy rules"
 Action: Read and display `~/.dippy/config`
+
+User: "allow all code-search MCP tools"
+Action: Append `allow-mcp mcp__code-search__*` to config
+
+User: "block all MCP delete operations"
+Action: Append `deny-mcp mcp__*__delete_*` to config
