@@ -26,7 +26,6 @@
 
 - **Max 3 attempts per issue, then STOP and reassess**
 - **Delegate by default** - 2+ independent subtasks = parallel subagents. Use agent teams for large coordinated implementations. Main context is for orchestration and talking to the user.
-- **Learn from mistakes** - Update `tasks/lessons.md` after user corrections
 - **Prove it works before marking done**
 
 ## Code Intelligence

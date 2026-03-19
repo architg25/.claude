@@ -1,26 +1,35 @@
 {
-  "alwaysThinkingEnabled": true,
-  "disableAllHooks": false,
-  "enableAllProjectMcpServers": true,
-  "enabledPlugins": {
-    "playground@claude-plugins-official": true,
-    "frontend-design@claude-code-plugins": true,
-    "document-skills@anthropic-agent-skills": true,
-    "superpowers@claude-plugins-official": true
-  },
   "env": {
     "model": "claude-opus-4-6[1m]",
     "EDITOR": "zed",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
-  "extraKnownMarketplaces": {
-    "anthropic-agent-skills": {
-      "source": {
-        "source": "github",
-        "repo": "anthropics/skills"
-      }
-    }
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": [
+      "Read",
+      "Write",
+      "Edit",
+      "MultiEdit",
+      "Grep",
+      "Glob",
+      "NotebookEdit",
+      "WebFetch",
+      "WebSearch",
+      "Skill",
+      "EnterWorktree",
+      "EnterPlanMode",
+      "TaskCreate",
+      "TaskUpdate",
+      "TaskGet",
+      "TaskList",
+      "TeamCreate",
+      "TeamDelete",
+      "SendMessage"
+    ]
   },
+  "model": "claude-opus-4-6[1m]",
+  "enableAllProjectMcpServers": true,
   "hooks": {
     "Notification": [
       {
@@ -100,7 +109,12 @@
       },
       {
         "matcher": "Bash|mcp__.*",
-        "hooks": [{ "type": "command", "command": "dippy" }]
+        "hooks": [
+          {
+            "type": "command",
+            "command": "dippy"
+          }
+        ]
       },
       {
         "matcher": "",
@@ -198,35 +212,33 @@
       }
     ]
   },
-  "includeCoAuthoredBy": false,
-  "model": "claude-opus-4-6[1m]",
-  "permissions": {
-    "allow": [
-      "Read",
-      "Write",
-      "Edit",
-      "MultiEdit",
-      "Grep",
-      "Glob",
-      "NotebookEdit",
-      "WebFetch",
-      "WebSearch",
-      "Skill",
-      "EnterWorktree",
-      "EnterPlanMode",
-      "TaskCreate",
-      "TaskUpdate",
-      "TaskGet",
-      "TaskList",
-      "TeamCreate",
-      "TeamDelete",
-      "SendMessage"
-    ]
-  },
+  "disableAllHooks": false,
   "statusLine": {
     "type": "command",
     "command": "~/.claude/ccline/ccline",
     "padding": 0
   },
+  "enabledPlugins": {
+    "playground@claude-plugins-official": true,
+    "frontend-design@claude-code-plugins": true,
+    "document-skills@anthropic-agent-skills": true,
+    "superpowers@claude-plugins-official": true,
+    "cli-anything@cli-anything": true
+  },
+  "extraKnownMarketplaces": {
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    },
+    "cli-anything": {
+      "source": {
+        "source": "github",
+        "repo": "HKUDS/CLI-Anything"
+      }
+    }
+  },
+  "alwaysThinkingEnabled": true,
   "teammateMode": "tmux"
 }
