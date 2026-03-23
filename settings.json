@@ -30,7 +30,9 @@
   },
   "model": "claude-opus-4-6[1m]",
   "enableAllProjectMcpServers": true,
-  "disabledMcpjsonServers": ["dynamo-mcp-dev"],
+  "disabledMcpjsonServers": [
+    "dynamo-mcp-dev"
+  ],
   "hooks": {
     "Notification": [
       {
@@ -224,8 +226,7 @@
     "frontend-design@claude-code-plugins": true,
     "document-skills@anthropic-agent-skills": true,
     "superpowers@claude-plugins-official": true,
-    "cli-anything@cli-anything": true,
-    "discord@claude-plugins-official": true
+    "cli-anything@cli-anything": true
   },
   "extraKnownMarketplaces": {
     "anthropic-agent-skills": {

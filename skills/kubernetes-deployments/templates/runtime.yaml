@@ -1,8 +1,0 @@
-apiVersion: runtime.spotify.com/v1alpha1
-kind: Runtime
-metadata:
-  name: {{SERVICE_NAME}}
-  namespace: {{NAMESPACE}}
-spec:
-  owners:
-    - {{TEAM}}@iam.spotify.com
