@@ -6,19 +6,16 @@ echo "Adding MCP servers to Claude Code"
 echo "==================================="
 echo ""
 
-# Add Sequential Thinking MCP
-echo "Adding sequential-thinking..."
-claude mcp add sequential-thinking -- npx -y @modelcontextprotocol/server-sequential-thinking -s user
-
 # Add Context7 MCP
 echo "Adding context7..."
-claude mcp add --transport http --scope user context7 https://mcp.context7.com/sse
+claude mcp add --transport http --scope user context7 https://mcp.context7.com/mcp
 
+# sequential-thinking: REMOVED — unused
 # aika-search: REMOVED — duplicate of claude.ai AiKA Search MCP
 
 # Add Code Search MCP
 echo "Adding code-search..."
-claude mcp add --transport http --scope user code-search https://mcp-gateway.spotify.net/code-search-mcp
+claude mcp add --transport http --scope user code-search http://code-search-mcp.services.gew1.spotify.net/mcp/
 
 # ghe-mcp: REMOVED — not loading (0 tools)
 # backstage-mcp-actions: REMOVED — not loading (0 tools)
@@ -38,34 +35,29 @@ echo "Adding context-mcp..."
 claude mcp add --transport http --scope user context-mcp https://mcp-gateway.spotify.net/context-mcp
 
 # google-calendar-mcp: REMOVED — not loading; calendar available via search_workplace_knowledge
+# o11y-agg-mcp: REMOVED — unused
+# google-drive-mcp: REMOVED — duplicate of claude.ai GDrive MCP
+# honk-coding-agent-mcp: REMOVED
+# component-metadata-mcp: REMOVED
+# dataplatform: REMOVED
+# deployments-mcp: REMOVED
+# grodor-mcp: REMOVED
 
-# Add Observability Aggregation MCP
-echo "Adding o11y-agg-mcp..."
-claude mcp add --transport http --scope user o11y-agg-mcp https://mcp-gateway.spotify.net/o11y-agg-mcp
+# Add Groove MCP
+echo "Adding groove-mcp..."
+claude mcp add --transport http --scope user groove-mcp https://mcp-gateway.spotify.net/groove-mcp
 
-# Add Google Drive MCP
-echo "Adding google-drive-mcp..."
-claude mcp add --transport http --scope user google-drive-mcp https://mcp-gateway.spotify.net/google-drive-mcp
+# Add Oliver MCP
+echo "Adding oliver..."
+claude mcp add --transport http --scope user oliver https://mcp-gateway.spotify.net/oliver
 
-# Add Honk Coding Agent MCP
-echo "Adding honk-coding-agent-mcp..."
-claude mcp add --transport http --scope user honk-coding-agent-mcp https://mcp-gateway.spotify.net/honk-coding-agent
+# Add Text2SQL MCP
+echo "Adding text2sql-mcp..."
+claude mcp add --transport http --scope user text2sql-mcp https://mcp-gateway.spotify.net/text2sql-mcp
 
-# Add Component Metadata MCP
-echo "Adding component-metadata-mcp..."
-claude mcp add --transport http --scope user component-metadata-mcp https://mcp-gateway.spotify.net/component-metadata-mcp
-
-# Add Data Platform MCP
-echo "Adding dataplatform..."
-claude mcp add --transport http --scope user dataplatform https://mcp-gateway.spotify.net/dataplatform
-
-# Add Deployments MCP
-echo "Adding deployments-mcp..."
-claude mcp add --transport http --scope user deployments-mcp https://mcp-gateway.spotify.net/deployments-mcp
-
-# Add Grodor MCP (Kubernetes resources)
-echo "Adding grodor-mcp..."
-claude mcp add --transport http --scope user grodor-mcp https://mcp-gateway.spotify.net/grodor-mcp
+# Add Dynamo MCP (gRPC service discovery/calling)
+echo "Adding dynamo-mcp..."
+claude mcp add dynamo-mcp --scope user -- uvx --index-url https://artifactory.spotify.net/artifactory/api/pypi/pypi/simple/ dynamo-mcp
 
 echo ""
 echo "All MCP servers added successfully!"
