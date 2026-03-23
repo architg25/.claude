@@ -28,11 +28,6 @@
 - **Delegate by default** - 2+ independent subtasks = parallel subagents. Use agent teams for large coordinated implementations. Main context is for orchestration and talking to the user.
 - **Prove it works before marking done**
 
-## Code Intelligence
-
-If using gh, the default is and should be GH_HOST=ghe.spotify.net, but if I give you github links
-switch the GH_HOST=github.com only for that.
-
 ## Decision Framework
 
 When multiple valid approaches exist, choose based on:
@@ -50,9 +45,5 @@ When multiple valid approaches exist, choose based on:
 - Use `find`, `ls`, `grep`, `cat`, `head`, `tail`, `sed`, `awk`, `echo >` via Bash - use dedicated tools (Glob, Grep, Read, Edit, Write) instead
 - Bypass commit hooks or disable tests
 - Make assumptions - verify with existing code
-
-**ALWAYS**:
-
-- Learn from existing implementations before writing new code
 
 **Remember: Write code as if the person maintaining it is a violent psychopath who knows where you live. Make it that clear.**
