@@ -28,6 +28,8 @@ Claude subagents try to **confirm** claims. Codex tries to **disprove** them. Ag
 
 **If no argument provided:** Scan the last ~10 messages. Extract every factual, code-verifiable claim you made. Skip opinions, suggestions, and questions.
 
+**If conversation history appears compressed or truncated:** Ask the user which claims to verify rather than guessing from incomplete context.
+
 **If argument provided:** Use that as the single claim to verify.
 
 Categorize each claim:
@@ -40,19 +42,11 @@ Categorize each claim:
 | **Service interaction** | "A calls B via gRPC"                  |
 | **Behavior**            | "Endpoint returns 404 when not found" |
 
+**Triage:** Not all claims need the full adversarial treatment. If a claim can be verified with a single Grep or Read (e.g., "X class imports Y"), just verify it inline and skip to the verdict. Reserve the dual-agent dispatch for claims that require searching across multiple files or repos.
+
 ### Step 1: Assess complexity and select models
 
-**Simple claims** — single-hop lookups, "X uses Y", "A depends on B":
-
-- Claude subagents: `model: "sonnet"`
-- Codex: `-m gpt-5.4-mini`
-
-**Complex claims** — data flows, multi-service interactions, behavioral assertions:
-
-- Claude subagents: `model: "opus"`
-- Codex: `-m gpt-5.4`
-
-When unsure, default to complex.
+Assess claims using the criteria in `shared:complexity-assessment`. Simple claims (single-hop lookups) get lighter models. Complex claims (data flows, multi-service interactions) get stronger models. When unsure, default to complex.
 
 ### Step 2: Build verification prompts
 
@@ -91,6 +85,7 @@ Instructions:
 - Check for edge cases, exceptions, or alternative paths
 - Look for naming that misleads (e.g., "read-only" class that also writes)
 - If you cannot find contradictions, say so explicitly
+- Only report contradictions backed by specific code references with file paths and line numbers. Do not speculate or infer contradictions — show the code.
 
 Report:
 1. **Contradictions found** — specific code that conflicts with the claim
@@ -127,8 +122,10 @@ Agent tool:
 **Codex (disprove):**
 
 ```bash
-mkdir -p /tmp/verify && codex exec --full-auto -m <model> -C <repo-path> -o /tmp/verify/disprove-<n>.md "<devil's advocate prompt>"
+VERIFY_DIR="/tmp/verify-$(date +%s)" && mkdir -p "$VERIFY_DIR" && codex exec --full-auto -m <model> -C <repo-path> -o "$VERIFY_DIR/disprove-<n>.md" "<devil's advocate prompt>"
 ```
+
+**Codex fallback and output validation:** See `shared:codex-dispatch` for the full Codex dispatch pattern including fallback to Claude subagents and output file validation.
 
 If Codex unavailable, use Claude subagent with the devil's advocate prompt:
 
@@ -192,7 +189,7 @@ Present a structured summary:
 
 ### Step 6: Save output
 
-Save the full report to `/tmp/verify/report.md`.
+Save the full report to `$VERIFY_DIR/report.md` (using the timestamped directory created in Step 3). If `$VERIFY_DIR` was not set (e.g., all claims were triaged inline), save to `/tmp/verify-$(date +%s)/report.md`.
 
 ## Important Rules
 
@@ -213,3 +210,5 @@ Save the full report to `/tmp/verify/report.md`.
 | Confirming by default                                     | Disprove agent should be actively hostile to the claim               |
 | Skipping Codex for disprove role                          | Different tools search differently; Codex catches Claude blind spots |
 | Disprove agent searching too narrowly                     | Search the FULL repo, not just the expected directory                |
+| Spawning dual agents for trivially-verifiable claims      | If one Grep answers it, just do it inline (Step 0 triage)            |
+| Not handling compressed conversation history              | Ask the user which claims to verify if history is truncated          |

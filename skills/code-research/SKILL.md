@@ -10,28 +10,31 @@ Dispatch multiple parallel researchers (Claude subagents + Codex instances) to i
 ## Usage
 
 ```
-/research <question>
+/code-research <question>
 ```
+
+## When NOT to Use
+
+Don't use this for questions answerable with a single tool call:
+
+- "Where is class Foo defined?" → just use Grep
+- "What files import X?" → just use Grep
+- "Show me the config file" → just use Glob + Read
+
+Rule of thumb: if you can answer it with one Grep or Glob, don't spawn 4 agents.
 
 ## Instructions
 
-### Step 0: Assess complexity and select models
+### Step 0: Assess complexity
 
-Before decomposing, assess the question complexity to choose appropriate models.
+Assess the question using the criteria in `shared:complexity-assessment`.
 
-**Simple** — single-hop lookups, "where is X defined", "what config does Y use", "find usages of Z":
+This determines both **model selection** and **researcher count**:
 
-- Claude subagents: `model: "sonnet"`
-- Codex: `-m gpt-5.4-mini`
+- **Simple questions:** 1-2 researchers, lighter models
+- **Complex questions:** 3-4 researchers, stronger models
 
-**Complex** — multi-service data flows, "how does X get from A to B", architectural questions, tracing through multiple repos:
-
-- Claude subagents: `model: "opus"`
-- Codex: `-m gpt-5.4`
-
-**Signals for complex:** multiple services/repos involved, requires tracing data flows, needs to understand architectural decisions, cross-team boundaries, or the user explicitly says "deep dive" / "thorough".
-
-**When unsure, default to complex.** Better to overshoot on model quality than miss findings.
+Do not spawn 4 agents for a question that only needs 2.
 
 ### Step 1: Decompose the question into research angles
 
@@ -102,7 +105,7 @@ Agent tool:
 **Codex launch:**
 
 ```bash
-mkdir -p /tmp/research && codex exec --full-auto -m <model> -o /tmp/research/codex-1.md "<focused research prompt>"
+RESEARCH_DIR="/tmp/research-$(date +%s)" && mkdir -p "$RESEARCH_DIR" && codex exec --full-auto -m <model> -o "$RESEARCH_DIR/codex-1.md" "<focused research prompt>"
 ```
 
 Use `-m gpt-5.4-mini` or `-m gpt-5.4` based on Step 0.
@@ -111,11 +114,15 @@ If in a git repo, add `-C /path/to/repo`. If NOT in a repo, add `--skip-git-repo
 
 Use `run_in_background: true` on the Bash tool call. Use distinct output files: `codex-1.md`, `codex-2.md`.
 
+**Codex fallback:** If Codex is unavailable (command not found), use a Claude subagent instead with the same prompt. See `shared:codex-dispatch` for the full pattern.
+
+**Output validation:** After Codex completes, verify the output file exists and is non-empty before reading. If missing or empty, note the failure and synthesize from remaining agents.
+
 ### Step 4: Collect and synthesize
 
 Once all researchers complete:
 
-1. Read Codex outputs from `/tmp/research/codex-*.md`
+1. Read Codex outputs from `$RESEARCH_DIR/codex-*.md`
 2. Claude subagent results come back directly
 
 Combine all findings into a single answer:
@@ -125,11 +132,13 @@ Combine all findings into a single answer:
 3. **Conflicts** — Where they disagree (investigate these yourself before presenting)
 4. **Gaps** — Questions no one could answer
 
+When multiple researchers find the same thing, consolidate — don't repeat the same evidence three times. Credit the finding once and note that multiple researchers confirmed it.
+
 Present the synthesis directly to the user. Lead with the answer, then supporting evidence.
 
 ### Step 5: Save output
 
-Save the synthesized report to `/tmp/research/synthesis.md` for reference.
+Save the synthesized report to `$RESEARCH_DIR/synthesis.md` for reference.
 
 ## Tips
 
@@ -137,3 +146,5 @@ Save the synthesized report to `/tmp/research/synthesis.md` for reference.
 - If one researcher fails, synthesize from the others — partial results are still valuable.
 - For cross-repo questions, make sure at least one Claude subagent's prompt explicitly says to use codesearch MCP (`search_code` tool).
 - For questions about a specific repo, point Codex at it with `-C`.
+- If a researcher hangs or returns empty/garbage, note it in synthesis and move on. Don't block the whole research on one failing agent.
+- If Codex is unavailable, fall back to Claude subagents. See `shared:codex-dispatch`.
