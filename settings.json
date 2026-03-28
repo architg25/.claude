@@ -57,10 +57,12 @@
         ]
       },
       {
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook"
+            "command": "/Users/architg/.pyenv/versions/3.13.3/lib/python3.13/site-packages/flaude/bin/flaude-hook",
+            "timeout": 3
           }
         ]
       }
@@ -80,7 +82,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
+            "command": "/Users/architg/.pyenv/versions/3.13.3/lib/python3.13/site-packages/flaude/bin/flaude-hook",
             "timeout": 3
           }
         ]
@@ -88,14 +90,12 @@
     ],
     "PreCompact": [
       {
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook"
-          },
-          {
-            "type": "command",
-            "command": "agent-deck hook-handler"
+            "command": "/Users/architg/.pyenv/versions/3.13.3/lib/python3.13/site-packages/flaude/bin/flaude-hook",
+            "timeout": 3
           }
         ]
       }
@@ -124,7 +124,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
+            "command": "/Users/architg/.pyenv/versions/3.13.3/lib/python3.13/site-packages/flaude/bin/flaude-hook",
             "timeout": 3
           }
         ]
@@ -132,15 +132,12 @@
     ],
     "SessionEnd": [
       {
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook"
-          },
-          {
-            "type": "command",
-            "command": "agent-deck hook-handler",
-            "async": true
+            "command": "/Users/architg/.pyenv/versions/3.13.3/lib/python3.13/site-packages/flaude/bin/flaude-hook",
+            "timeout": 3
           }
         ]
       }
@@ -160,25 +157,24 @@
         ]
       },
       {
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook"
+            "command": "/Users/architg/.pyenv/versions/3.13.3/lib/python3.13/site-packages/flaude/bin/flaude-hook",
+            "timeout": 3
           }
         ]
       }
     ],
     "Stop": [
       {
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook"
-          },
-          {
-            "type": "command",
-            "command": "agent-deck hook-handler",
-            "async": true
+            "command": "/Users/architg/.pyenv/versions/3.13.3/lib/python3.13/site-packages/flaude/bin/flaude-hook",
+            "timeout": 3
           }
         ]
       }
@@ -189,7 +185,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook",
+            "command": "/Users/architg/.pyenv/versions/3.13.3/lib/python3.13/site-packages/flaude/bin/flaude-hook",
             "timeout": 3
           }
         ]
@@ -206,10 +202,12 @@
         ]
       },
       {
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/architg/Git/flaude/src/flaude/bin/flaude-hook"
+            "command": "/Users/architg/.pyenv/versions/3.13.3/lib/python3.13/site-packages/flaude/bin/flaude-hook",
+            "timeout": 3
           }
         ]
       }
@@ -243,5 +241,7 @@
     }
   },
   "alwaysThinkingEnabled": true,
+  "autoMemoryEnabled": false,
+  "autoDreamEnabled": false,
   "teammateMode": "tmux"
 }

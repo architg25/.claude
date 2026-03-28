@@ -64,7 +64,6 @@ fi
 [[ "$TOOL" =~ ^mcp__code-search__ ]]          && allow "Code search"
 [[ "$TOOL" =~ ^mcp__context7__ ]]             && allow "Context7"
 [[ "$TOOL" =~ ^mcp__cloud-logging-mcp__ ]]    && allow "Cloud logging"
-[[ "$TOOL" =~ ^mcp__context-mcp__ ]]          && allow "Context MCP"
 [[ "$TOOL" =~ ^mcp__ide__ ]]                  && allow "IDE diagnostics"
 
 # claude_ai MCP servers

@@ -30,9 +30,7 @@ claude mcp add --transport http --scope user atlassian-mcp https://mcp-gateway.s
 echo "Adding cloud-logging-mcp..."
 claude mcp add --transport http --scope user cloud-logging-mcp https://mcp-gateway.spotify.net/cloud-logging-mcp
 
-# Add Context MCP
-echo "Adding context-mcp..."
-claude mcp add --transport http --scope user context-mcp https://mcp-gateway.spotify.net/context-mcp
+# context-mcp: REMOVED
 
 # google-calendar-mcp: REMOVED — not loading; calendar available via search_workplace_knowledge
 # o11y-agg-mcp: REMOVED — unused
