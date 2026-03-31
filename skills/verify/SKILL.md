@@ -101,10 +101,10 @@ Launch all agents concurrently. All tool calls MUST be in the same message.
 
 **For each claim group, launch TWO agents — one to CONFIRM, one to DISPROVE:**
 
-| Agent           | Role     | Tool                                                     |
-| --------------- | -------- | -------------------------------------------------------- |
-| Claude subagent | Confirm  | Agent tool, `run_in_background: true`                    |
-| Codex instance  | Disprove | Bash `codex exec --full-auto`, `run_in_background: true` |
+| Agent           | Role     | Tool                                                       |
+| --------------- | -------- | ---------------------------------------------------------- |
+| Claude subagent | Confirm  | Agent tool, `run_in_background: true`                      |
+| Codex rescue    | Disprove | Agent tool `codex:codex-rescue`, `run_in_background: true` |
 
 If Codex is unavailable, use a second Claude subagent for the disprove role instead.
 
@@ -121,11 +121,17 @@ Agent tool:
 
 **Codex (disprove):**
 
-```bash
-VERIFY_DIR="/tmp/verify-$(date +%s)" && mkdir -p "$VERIFY_DIR" && codex exec --full-auto -m <model> -C <repo-path> -o "$VERIFY_DIR/codex-disprove-<n>.md" "<devil's advocate prompt>"
+```
+Agent tool:
+  subagent_type: "codex:codex-rescue"
+  prompt: "--fresh <devil's advocate prompt>"
+  run_in_background: true
+  name: "codex-disprove-<n>"
 ```
 
-**Codex fallback and output validation:** See `shared:codex-dispatch` for the full Codex dispatch pattern including fallback to Claude subagents and output file validation.
+For complex claims (per `shared:complexity-assessment`), add `--effort high` to the prompt. For simple claims, use `--model spark`. Frame the prompt as investigation/research so the rescue subagent runs read-only.
+
+**Codex fallback:** If the rescue subagent returns a failure (Codex unavailable or errors on launch), fall back to a Claude subagent with the same disprove prompt:
 
 If Codex unavailable, use Claude subagent with the devil's advocate prompt:
 
@@ -150,7 +156,7 @@ Use `run_in_background: true` on all tool calls.
 
 ### Step 4: Synthesize verdicts
 
-Once all agents complete, read Codex outputs and compare with Claude results.
+Once all agents complete, compare results. Claude subagent results and Codex rescue results both come back as agent return values — no files to read.
 
 **For each claim, determine verdict:**
 
@@ -189,7 +195,7 @@ Present a structured summary:
 
 ### Step 6: Save output
 
-Save the full report to `$VERIFY_DIR/report.md` (using the timestamped directory created in Step 3). If `$VERIFY_DIR` was not set (e.g., all claims were triaged inline), save to `/tmp/verify-$(date +%s)/report.md`.
+Save the full report to `/tmp/verify-$(date +%s)/report.md`.
 
 ## Important Rules
 
@@ -201,14 +207,14 @@ Save the full report to `$VERIFY_DIR/report.md` (using the timestamped directory
 
 ## Common Mistakes
 
-| Mistake                                                   | Fix                                                                  |
-| --------------------------------------------------------- | -------------------------------------------------------------------- |
-| Doing all research yourself instead of dispatching agents | Follow Step 3. Dispatch confirm + disprove agents.                   |
-| Waffling on counts ("it's 5... or maybe 7")               | List every item by name, then count the list                         |
-| Treating README as ground truth                           | README is a hint. Code is the answer.                                |
-| Binary verdicts only                                      | Use PARTIALLY TRUE when claim is directionally correct               |
-| Confirming by default                                     | Disprove agent should be actively hostile to the claim               |
-| Skipping Codex for disprove role                          | Different tools search differently; Codex catches Claude blind spots |
-| Disprove agent searching too narrowly                     | Search the FULL repo, not just the expected directory                |
-| Spawning dual agents for trivially-verifiable claims      | If one Grep answers it, just do it inline (Step 0 triage)            |
-| Not handling compressed conversation history              | Ask the user which claims to verify if history is truncated          |
+| Mistake                                                   | Fix                                                                                                       |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Doing all research yourself instead of dispatching agents | Follow Step 3. Dispatch confirm + disprove agents.                                                        |
+| Waffling on counts ("it's 5... or maybe 7")               | List every item by name, then count the list                                                              |
+| Treating README as ground truth                           | README is a hint. Code is the answer.                                                                     |
+| Binary verdicts only                                      | Use PARTIALLY TRUE when claim is directionally correct                                                    |
+| Confirming by default                                     | Disprove agent should be actively hostile to the claim                                                    |
+| Skipping Codex for disprove role                          | Different models search differently; Codex catches Claude blind spots. Use `codex:codex-rescue` subagent. |
+| Disprove agent searching too narrowly                     | Search the FULL repo, not just the expected directory                                                     |
+| Spawning dual agents for trivially-verifiable claims      | If one Grep answers it, just do it inline (Step 0 triage)                                                 |
+| Not handling compressed conversation history              | Ask the user which claims to verify if history is truncated                                               |
