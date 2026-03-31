@@ -224,7 +224,8 @@
     "frontend-design@claude-code-plugins": true,
     "document-skills@anthropic-agent-skills": true,
     "superpowers@claude-plugins-official": true,
-    "cli-anything@cli-anything": true
+    "cli-anything@cli-anything": true,
+    "codex@openai-codex": true
   },
   "extraKnownMarketplaces": {
     "anthropic-agent-skills": {
@@ -237,6 +238,12 @@
       "source": {
         "source": "github",
         "repo": "HKUDS/CLI-Anything"
+      }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
       }
     }
   },
