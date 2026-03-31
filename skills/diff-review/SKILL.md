@@ -21,7 +21,7 @@ You wrote the code. You can't objectively review it. Codex uses different models
 ## When to Use This vs `/full-review`
 
 - **`/diff-review`**: Pre-PR gate. Lightweight, single reviewer (Codex), fast. Use before creating a PR.
-- **`/full-review`**: Post-PR deep review. Multi-reviewer (Claude + Codex + Gemini), thorough. Use on existing PRs.
+- **`/full-review`**: Post-PR deep review. Multi-reviewer (Claude + Codex), thorough. Use on existing PRs.
 
 ## Instructions
 
@@ -142,15 +142,17 @@ Same format as critical issues.
 
 ### Step 3: Dispatch Codex
 
-Use the `shared:codex-dispatch` pattern. Always use the stronger model — code review benefits from reasoning.
+Dispatch a `codex:codex-rescue` subagent. Always use the stronger model — code review benefits from reasoning.
 
-```bash
-codex exec --full-auto -m gpt-5.4 -C "$(git rev-parse --show-toplevel)" -o "$REVIEW_DIR/codex-review.md" "<review prompt referencing $REVIEW_DIR/diff.patch>"
+```
+Agent tool:
+  subagent_type: "codex:codex-rescue"
+  prompt: "--fresh <review prompt — include the diff content directly in the prompt since the subagent can't read /tmp files>"
+  run_in_background: true
+  name: "codex-diff-review"
 ```
 
-Run with `run_in_background: true` on the Bash tool.
-
-**Codex fallback:** If Codex is unavailable (`command not found`), dispatch a Claude subagent instead:
+**Codex fallback:** If the rescue subagent returns a failure (Codex unavailable), dispatch a Claude subagent instead:
 
 ```
 Agent tool:
@@ -169,9 +171,8 @@ When using Claude fallback, you must include the diff content in the prompt (the
 
 Once Codex completes:
 
-1. Validate the output file exists and is non-empty
-2. Read the review from `$REVIEW_DIR/codex-review.md`
-3. Present the results to the user
+1. The rescue subagent returns the review as its output — no files to read
+2. Present the results to the user
 
 **If the verdict is LGTM:** Tell the user the diff looks clean. If this was triggered as part of `/ship` or PR creation, proceed to that next step.
 
@@ -183,7 +184,7 @@ Once Codex completes:
 
 ### Step 5: Save output
 
-Keep the review at `$REVIEW_DIR/codex-review.md`. Print the path so the user can reference it.
+Save the review to `/tmp/diff-review-$(date +%s)/codex-review.md`. Print the path so the user can reference it.
 
 ## Integration with Other Skills
 
