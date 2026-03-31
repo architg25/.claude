@@ -29,12 +29,7 @@ Rule of thumb: if you can answer it with one Grep or Glob, don't spawn 4 agents.
 
 Assess the question using the criteria in `shared:complexity-assessment`.
 
-This determines both **model selection** and **researcher count**:
-
-- **Simple questions:** 1-2 researchers, lighter models
-- **Complex questions:** 3-4 researchers, stronger models
-
-Do not spawn 4 agents for a question that only needs 2.
+This determines **model selection**. Do not artificially limit researcher count — use as many angles as the question needs.
 
 ### Step 1: Decompose the question into research angles
 
@@ -80,16 +75,18 @@ Write your findings as a structured report with:
 
 Create the output directory and launch all agents concurrently. All tool calls MUST be in the same message.
 
-**Researcher assignment strategy:**
+**You MUST use both Claude subagents AND Codex instances.** Do not use only Claude subagents. Codex has MCP access (including codesearch) and can explore codebases independently. Using a different model family acts as a cross-check — if Claude and Codex agree, confidence is high; if they disagree, you know where to dig deeper during synthesis.
 
-| Researcher      | Tool                                          | Best for                                   |
-| --------------- | --------------------------------------------- | ------------------------------------------ |
-| Claude subagent | Agent tool (`run_in_background: true`)        | Local code (Glob, Grep, Read)              |
-| Claude subagent | Agent tool (`run_in_background: true`)        | Codesearch MCP (`search_code`), cross-repo |
-| Codex instance  | Bash `codex exec` (`run_in_background: true`) | Independent codebase exploration           |
-| Codex instance  | Bash `codex exec` (`run_in_background: true`) | Second exploration angle                   |
+**Minimum mix:** At least 1 Codex instance and at least 1 Claude subagent. For 3-4 researchers, use 2 of each.
 
-Assign angles to researchers based on what tools they need. Claude subagents get MCP and local tools. Codex gets independent exploration.
+**Naming convention:** Prefix every researcher name with `claude-` or `codex-` so the synthesis output clearly shows which model produced which findings.
+
+| Researcher      | Tool                                          | Name example        |
+| --------------- | --------------------------------------------- | ------------------- |
+| Claude subagent | Agent tool (`run_in_background: true`)        | `claude-local-code` |
+| Claude subagent | Agent tool (`run_in_background: true`)        | `claude-cross-repo` |
+| Codex instance  | Bash `codex exec` (`run_in_background: true`) | `codex-data-flow`   |
+| Codex instance  | Bash `codex exec` (`run_in_background: true`) | `codex-api-surface` |
 
 **Claude subagent launch:**
 
@@ -98,21 +95,21 @@ Agent tool:
   subagent_type: "general-purpose"
   prompt: <focused research prompt for this angle>
   run_in_background: true
-  name: "researcher-1"  (use descriptive names like "researcher-local-code")
+  name: "claude-<angle>"  (e.g. "claude-local-code", "claude-cross-repo")
   model: "haiku" or "opus"  (from Step 0)
 ```
 
 **Codex launch:**
 
 ```bash
-RESEARCH_DIR="/tmp/research-$(date +%s)" && mkdir -p "$RESEARCH_DIR" && codex exec --full-auto -m <model> -o "$RESEARCH_DIR/codex-1.md" "<focused research prompt>"
+RESEARCH_DIR="/tmp/research-$(date +%s)" && mkdir -p "$RESEARCH_DIR" && codex exec --full-auto -m <model> -o "$RESEARCH_DIR/codex-<angle>.md" "<focused research prompt>"
 ```
 
 Use `-m gpt-5.4-mini` or `-m gpt-5.4` based on Step 0.
 
 If in a git repo, add `-C /path/to/repo`. If NOT in a repo, add `--skip-git-repo-check`.
 
-Use `run_in_background: true` on the Bash tool call. Use distinct output files: `codex-1.md`, `codex-2.md`.
+Use `run_in_background: true` on the Bash tool call. Use distinct output files per angle: `codex-data-flow.md`, `codex-api-surface.md`, etc.
 
 **Codex fallback:** If Codex is unavailable (command not found), use a Claude subagent instead with the same prompt. See `shared:codex-dispatch` for the full pattern.
 
@@ -122,7 +119,7 @@ Use `run_in_background: true` on the Bash tool call. Use distinct output files: 
 
 Once all researchers complete:
 
-1. Read Codex outputs from `$RESEARCH_DIR/codex-*.md`
+1. Read Codex outputs from `$RESEARCH_DIR/codex-*.md` (named by angle)
 2. Claude subagent results come back directly
 
 Combine all findings into a single answer:
@@ -142,7 +139,6 @@ Save the synthesized report to `$RESEARCH_DIR/synthesis.md` for reference.
 
 ## Tips
 
-- 3-4 total researchers is the sweet spot. More adds synthesis overhead without proportional value.
 - If one researcher fails, synthesize from the others — partial results are still valuable.
 - For cross-repo questions, make sure at least one Claude subagent's prompt explicitly says to use codesearch MCP (`search_code` tool).
 - For questions about a specific repo, point Codex at it with `-C`.

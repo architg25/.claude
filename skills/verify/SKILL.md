@@ -20,7 +20,7 @@ Claude subagents try to **confirm** claims. Codex tries to **disprove** them. Ag
 
 **The dual-agent structure is mandatory.** You MUST dispatch separate agents — one to confirm, one to disprove. Do NOT do all research yourself in a single pass. Single-pass verification produces confirmation bias even when you try to be objective. The adversarial framing only works when different agents have different jobs.
 
-**Use Codex for disprove agents when available.** Different tools have different search strategies — Claude and Codex will look in different places. This catches false negatives (e.g., one agent missing code in `app-supply-controls-unknown/` because it only searched `podcast-ads-delivery/`). Only fall back to Claude-only when Codex is genuinely unavailable, not because it's "easier" to skip.
+**You MUST use Codex for disprove agents.** Different model families have different search strategies — Claude and Codex will look in different places. This catches false negatives (e.g., one agent missing code in `app-supply-controls-unknown/` because it only searched `podcast-ads-delivery/`). If both models agree, confidence is high; if they disagree, you know where to dig deeper. Only fall back to Claude-only when Codex is genuinely unavailable (command not found), not because it's "easier" to skip.
 
 ## Instructions
 
@@ -115,14 +115,14 @@ Agent tool:
   subagent_type: "general-purpose"
   prompt: <confirmation prompt>
   run_in_background: true
-  name: "verify-confirm-<n>"
+  name: "claude-confirm-<n>"
   model: <from Step 1>
 ```
 
 **Codex (disprove):**
 
 ```bash
-VERIFY_DIR="/tmp/verify-$(date +%s)" && mkdir -p "$VERIFY_DIR" && codex exec --full-auto -m <model> -C <repo-path> -o "$VERIFY_DIR/disprove-<n>.md" "<devil's advocate prompt>"
+VERIFY_DIR="/tmp/verify-$(date +%s)" && mkdir -p "$VERIFY_DIR" && codex exec --full-auto -m <model> -C <repo-path> -o "$VERIFY_DIR/codex-disprove-<n>.md" "<devil's advocate prompt>"
 ```
 
 **Codex fallback and output validation:** See `shared:codex-dispatch` for the full Codex dispatch pattern including fallback to Claude subagents and output file validation.
@@ -134,7 +134,7 @@ Agent tool:
   subagent_type: "general-purpose"
   prompt: <devil's advocate prompt>
   run_in_background: true
-  name: "verify-disprove-<n>"
+  name: "claude-disprove-<n>"
   model: <from Step 1>
 ```
 
