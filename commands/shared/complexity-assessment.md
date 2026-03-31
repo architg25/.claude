@@ -26,12 +26,21 @@ When unsure, **default to Complex**. Overestimating complexity wastes a bit of c
 
 ## Model Mapping
 
-| Tier    | Claude subagents  | Codex model                            |
-| ------- | ----------------- | -------------------------------------- |
-| Simple  | `model: "sonnet"` | lighter model (e.g. `-m gpt-5.4-mini`) |
-| Complex | `model: "opus"`   | stronger model (e.g. `-m gpt-5.4`)     |
+| Tier    | Claude subagents  | Codex (via `codex:codex-rescue`) |
+| ------- | ----------------- | -------------------------------- |
+| Simple  | `model: "sonnet"` | `--model spark`                  |
+| Complex | `model: "opus"`   | default (omit `--model`)         |
 
 > Model IDs will change over time. Update this table when new models are available. The key principle is: **use cheaper/faster models for simple tasks, stronger models for complex ones.**
+
+## Effort Mapping
+
+The `--effort` flag controls Codex reasoning depth. Pass it as a flag in the rescue prompt (e.g., `--effort high <prompt>`).
+
+| Tier    | Effort flag                         |
+| ------- | ----------------------------------- |
+| Simple  | omit (let Codex decide)             |
+| Complex | `--effort high` or `--effort xhigh` |
 
 ## Researcher Count (research-style skills)
 
