@@ -112,31 +112,37 @@ If the message contains factual claims about code, architecture, services, or be
 
 Dispatch Codex to independently review the message and destination:
 
-```bash
-SLACK_DIR="/tmp/slack-review-$(date +%s)" && mkdir -p "$SLACK_DIR" && codex exec --full-auto -m gpt-5.4-mini --skip-git-repo-check -o "$SLACK_DIR/review.md" "Review this Slack message for issues before posting.
+```
+Agent tool:
+  subagent_type: "codex:codex-rescue"
+  prompt: |
+    --fresh --model spark
+    Review this Slack message for issues before posting.
 
-MESSAGE:
-<paste full message text>
+    MESSAGE:
+    <paste full message text>
 
-DESTINATION: <channel/DM + thread if applicable>
-CONTEXT: <1-2 sentences on what the conversation was about>
+    DESTINATION: <channel/DM + thread if applicable>
+    CONTEXT: <1-2 sentences on what the conversation was about>
 
-Check for:
-1. Wrong audience — is this message appropriate for this channel/person? Would it make sense to someone reading the channel?
-2. Tone mismatch — too casual for an incident channel? too formal for team chat? off-putting?
-3. Missing context — would readers need background to understand this? Are there implicit references that won't land?
-4. Anything else that looks off
+    Check for:
+    1. Wrong audience — is this message appropriate for this channel/person? Would it make sense to someone reading the channel?
+    2. Tone mismatch — too casual for an incident channel? too formal for team chat? off-putting?
+    3. Missing context — would readers need background to understand this? Are there implicit references that won't land?
+    4. Anything else that looks off
 
-Note: Sensitive data and factual claims have already been checked. Focus on audience, tone, and clarity.
+    Note: Sensitive data and factual claims have already been checked. Focus on audience, tone, and clarity.
 
-Report: List any issues found, or confirm 'No issues found' if clean."
+    Report: List any issues found, or confirm 'No issues found' if clean.
+  run_in_background: true
+  name: "codex-slack-review"
 ```
 
-Read the Codex output. If issues found, fix them before proceeding.
+Read the rescue subagent's output. If issues found, fix them before proceeding.
 
-**Codex fallback:** If Codex is unavailable, use a Claude subagent with the same review prompt. See `shared:codex-dispatch` for the full pattern.
+**Codex fallback:** If the rescue subagent returns a failure (Codex unavailable), use a Claude subagent with the same review prompt.
 
-**Output validation:** Verify the output file exists and is non-empty before reading. If Codex failed, note it in the verification summary but don't block the post — the other checks still ran.
+If the rescue subagent failed, note it in the verification summary but don't block the post — the other checks still ran.
 
 ### Step 7: Present to User for Approval
 
