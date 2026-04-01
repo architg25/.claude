@@ -33,6 +33,15 @@ When unsure, **default to Complex**. Overestimating complexity wastes a bit of c
 
 > Model IDs will change over time. Update this table when new models are available. The key principle is: **use cheaper/faster models for simple tasks, stronger models for complex ones.**
 
+## Effort Mapping
+
+The Codex `--effort` flag controls reasoning depth. Useful with `codex exec`.
+
+| Tier    | Effort flag                         |
+| ------- | ----------------------------------- |
+| Simple  | omit (let Codex decide)             |
+| Complex | `--effort high` or `--effort xhigh` |
+
 ## Researcher Count (research-style skills)
 
 | Tier    | Researchers |

@@ -21,7 +21,7 @@ You wrote the code. You can't objectively review it. Codex uses different models
 ## When to Use This vs `/full-review`
 
 - **`/diff-review`**: Pre-PR gate. Lightweight, single reviewer (Codex), fast. Use before creating a PR.
-- **`/full-review`**: Post-PR deep review. Multi-reviewer (Claude + Codex + Gemini), thorough. Use on existing PRs.
+- **`/full-review`**: Post-PR deep review. Multi-reviewer (Claude + Codex), thorough. Use on existing PRs.
 
 ## Instructions
 

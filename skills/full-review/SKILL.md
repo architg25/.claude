@@ -1,11 +1,11 @@
 ---
 name: full-review
-description: "Run a comprehensive PR review using Claude, Codex, and Gemini in parallel. Synthesizes independent reviews into actionable feedback."
+description: "Run a comprehensive PR review using Claude and Codex in parallel. Synthesizes independent reviews into actionable feedback."
 ---
 
 # Full PR Review
 
-Run a comprehensive code review on a GitHub PR using three AI reviewers in parallel: Claude, Codex, and Gemini. Each reviewer independently analyzes the PR, then you synthesize their findings.
+Run a comprehensive code review on a GitHub PR using two AI reviewers in parallel: Claude and Codex. Each reviewer independently analyzes the PR, then you synthesize their findings.
 
 ## Usage
 
@@ -18,10 +18,10 @@ The script needs the full URL to know which repo to clone.
 
 Use `--post` to automatically post the synthesized review as a PR comment after synthesis.
 
-
 ## Policy / Safety
 
 **Enterprise authentication required:**
+
 - All two providers (Claude, Codex) must use Spotify enterprise accounts
 - Do not use personal API keys for internal Spotify repositories
 
@@ -29,9 +29,9 @@ Use `--post` to automatically post the synthesized review as a PR comment after 
 
 1. Runs the ai-pr-review.sh script two times in parallel (Claude, Codex)
 2. Each reviewer independently:
-    - Fetches the PR diff
-    - Reads CLAUDE.md guidelines
-    - Produces a structured review
+   - Fetches the PR diff
+   - Reads CLAUDE.md guidelines
+   - Produces a structured review
 3. Saves reviews to separate files
 4. You then synthesize the reviews
 
@@ -46,6 +46,7 @@ scripts/full-pr-review.sh <PR_URL> [--post]
 ```
 
 **Getting the PR URL:**
+
 - If the user provides a full URL, use it directly
 - If the user provides just a PR number, you must construct the full URL
 - If no PR is specified, detect the current PR's URL:
@@ -79,6 +80,7 @@ After reading all three reviews:
 ### Step 4: Post the synthesized review
 
 If the script output contains `POST_REVIEW=true`, you MUST:
+
 1. Save your synthesized review to `/tmp/synthesized-review.md`
 2. Post it as a PR comment using the command shown in the script output
 
@@ -89,9 +91,9 @@ gh pr comment <PR_URL> --body-file /tmp/synthesized-review.md
 ## Output Files
 
 Reviews are saved to `/tmp/pr-review-<PR_NUMBER>/`:
+
 - `/tmp/pr-review-123/claude.md` - Claude's independent review
 - `/tmp/pr-review-123/codex.md` - Codex's independent review
-- `/tmp/pr-review-123/gemini.md` - Gemini's independent review
 - `/tmp/pr-review-123/synthesized.md` - Your synthesized review (if posting)
 
 This allows running reviews for multiple PRs simultaneously.
@@ -111,17 +113,21 @@ Format your synthesized review as:
 ```markdown
 ## Synthesized PR Review
 
-**Reviewers**: Claude, Codex, Gemini
+**Reviewers**: Claude, Codex
 
 ### Critical Issues (consensus)
+
 - Issues identified by 2+ reviewers
 
 ### Important Issues
+
 - Significant issues from individual reviewers
 
 ### Suggestions
+
 - Minor improvements and style suggestions
 
 ### Reviewer Notes
+
 - Any conflicts or interesting differences between reviews
 ```
