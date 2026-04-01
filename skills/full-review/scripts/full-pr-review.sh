@@ -12,23 +12,31 @@ set -euo pipefail
 
 PR=""
 POST=""
+MODEL=""
+EFFORT=""
 
 # Parse arguments
-for arg in "$@"; do
-  case "$arg" in
-    --post)
-      POST="--post"
-      ;;
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --post) POST="--post"; shift ;;
+    --model) MODEL="$2"; shift 2 ;;
+    --effort) EFFORT="$2"; shift 2 ;;
     *)
       if [[ -z "$PR" ]]; then
-        PR="$arg"
+        PR="$1"
       fi
+      shift
       ;;
   esac
 done
 
+# Build passthrough flags for ai-pr-review.sh
+MODEL_ARGS=""
+if [[ -n "$MODEL" ]]; then MODEL_ARGS="--model $MODEL"; fi
+if [[ -n "$EFFORT" ]]; then MODEL_ARGS="$MODEL_ARGS --effort $EFFORT"; fi
+
 if [[ -z "$PR" ]]; then
-  echo "Usage: $0 <PR_URL> [--post]" >&2
+  echo "Usage: $0 <PR_URL> [--model MODEL] [--effort EFFORT] [--post]" >&2
   echo "Example: $0 https://github.com/org/repo/pull/123" >&2
   exit 2
 fi
@@ -96,14 +104,14 @@ unset CLAUDECODE
 
 (
   echo "=== Starting Claude review ==="
-  "$AI_REVIEW_SCRIPT" claude "$PR" 2>&1 || echo "Claude review failed"
+  "$AI_REVIEW_SCRIPT" claude "$PR" $MODEL_ARGS 2>&1 || echo "Claude review failed"
   echo "=== Claude review complete ==="
 ) &
 CLAUDE_PID=$!
 
 (
   echo "=== Starting Codex review ==="
-  "$AI_REVIEW_SCRIPT" codex "$PR" 2>&1 || echo "Codex review failed"
+  "$AI_REVIEW_SCRIPT" codex "$PR" $MODEL_ARGS 2>&1 || echo "Codex review failed"
   echo "=== Codex review complete ==="
 ) &
 CODEX_PID=$!

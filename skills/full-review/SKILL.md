@@ -38,13 +38,19 @@ Use `--post` to automatically post the synthesized review as a PR comment after 
 
 ## Instructions
 
-### Step 1: Run the parallel reviews
+### Step 1: Determine model and effort
+
+Code review is always **Complex** tier. Read `shared:complexity-assessment` to get the current Codex model and effort flags. Pass them as `--model` and `--effort` to the script.
+
+### Step 2: Run the parallel reviews
 
 Run the full-pr-review.sh script from this skill's scripts directory:
 
 ```bash
-scripts/full-pr-review.sh <PR_URL> [--post]
+scripts/full-pr-review.sh <PR_URL> --model <CODEX_MODEL> --effort <EFFORT> [--post]
 ```
+
+The `--model` flag is used for Codex only (Claude uses its own default). The `--effort` flag is passed to Codex's `--effort`.
 
 **Getting the PR URL:**
 
@@ -59,7 +65,7 @@ scripts/full-pr-review.sh "$PR_URL"
 
 Add `--post` if the user wants to post the synthesized review as a PR comment.
 
-### Step 2: Read all three reviews
+### Step 3: Read both reviews
 
 After the script completes, read the review files:
 
@@ -68,9 +74,9 @@ After the script completes, read the review files:
 /tmp/codex-pr-review.md
 ```
 
-### Step 3: Synthesize and investigate
+### Step 4: Synthesize and investigate
 
-After reading all three reviews:
+After reading both reviews:
 
 1. **Identify consensus**: Issues flagged by multiple reviewers are higher priority
 2. **Note unique insights**: Each AI may catch different issues
@@ -78,7 +84,7 @@ After reading all three reviews:
 4. **Create a synthesis**: Combine the best insights from each review
 5. **Verify claims**: Check any specific line numbers or code references mentioned
 
-### Step 4: Post the synthesized review
+### Step 5: Post the synthesized review
 
 If the script output contains `POST_REVIEW=true`, you MUST:
 
