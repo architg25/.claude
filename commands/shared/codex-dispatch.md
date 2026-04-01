@@ -49,12 +49,12 @@ After Codex completes, verify results before consuming them:
 
 ## Model selection
 
-Reference `shared:complexity-assessment` for the complexity tier of the current task.
+Reference `shared:complexity-assessment` for the complexity tier and model IDs. Use the Codex model column:
 
-- **Simple tasks** -- use the lighter Codex model.
-- **Complex tasks** -- use the stronger Codex model.
+- **Simple tasks** → lighter Codex model from the table (currently `gpt-5.4-mini`)
+- **Complex tasks** → stronger Codex model from the table (currently `gpt-5.4`)
 
-Actual model IDs should be set in the parent skill's complexity assessment step, not hardcoded here. This pattern only defines the dispatch mechanics.
+When in doubt, default to Complex. The model IDs here are just for quick reference — `shared:complexity-assessment` is the source of truth.
 
 ## Fallback: Codex unavailable
 

@@ -105,7 +105,7 @@ Agent tool:
 RESEARCH_DIR="/tmp/research-$(date +%s)" && mkdir -p "$RESEARCH_DIR" && codex exec --full-auto -m <model> -o "$RESEARCH_DIR/codex-<angle>.md" "<focused research prompt>"
 ```
 
-Use the Codex model from `shared:complexity-assessment` based on Step 0.
+Use `shared:codex-dispatch` for the dispatch pattern and model selection (based on Step 0 tier).
 
 If in a git repo, add `-C /path/to/repo`. If NOT in a repo, add `--skip-git-repo-check`.
 

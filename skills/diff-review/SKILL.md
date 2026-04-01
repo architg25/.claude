@@ -143,7 +143,7 @@ Same format as critical issues.
 
 ### Step 3: Dispatch Codex
 
-Assess the diff using `shared:complexity-assessment` and use the appropriate Codex model. Use `shared:codex-dispatch` for the dispatch pattern.
+Use `shared:codex-dispatch` for the dispatch pattern and model selection (assess complexity per `shared:complexity-assessment`).
 
 ```bash
 codex exec --full-auto -m <model from complexity-assessment> -C "$(git rev-parse --show-toplevel)" -o "$REVIEW_DIR/codex-review.md" "<review prompt referencing $REVIEW_DIR/diff.patch>"

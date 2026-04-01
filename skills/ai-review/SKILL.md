@@ -63,7 +63,7 @@ npm i -g @openai/codex
 
 ## Instructions
 
-Run the ai-pr-review.sh script from this skill's scripts directory. Code review is always **Complex** tier — use `shared:complexity-assessment` to determine the `--model` and `--effort` flags to pass.
+Run the ai-pr-review.sh script from this skill's scripts directory. Use `shared:complexity-assessment` for the tier and Claude model, `shared:codex-dispatch` for the Codex model. Pass via `--claude-model` and `--codex-model`.
 
 ```bash
 scripts/ai-pr-review.sh <provider> <PR_URL> [--claude-model MODEL] [--codex-model MODEL] [--post]
@@ -111,4 +111,4 @@ This allows running reviews for multiple PRs simultaneously.
 
 ## Models Used
 
-See `shared:complexity-assessment` for current model and effort mappings. Code review is always **Complex** tier.
+Claude model from `shared:complexity-assessment`. Codex model from `shared:codex-dispatch`.
