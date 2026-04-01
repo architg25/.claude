@@ -16,7 +16,7 @@ Run an AI-powered code review on a GitHub PR using your choice of AI provider.
 Where `<provider>` is one of: `claude`, `codex`
 
 **IMPORTANT**: Always use full PR URLs (e.g., `https://github.com/org/repo/pull/123`).
-The script clones the repo to allow the AI to explore the full codebase.
+The script fetches the PR diff via `gh` and the AI uses codesearch MCP for codebase exploration (no cloning needed).
 
 ## Prerequisites
 

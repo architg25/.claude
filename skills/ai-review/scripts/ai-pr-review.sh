@@ -55,13 +55,11 @@ esac
 # Detect GH_HOST and REPO from PR URL or require them as environment variables
 # This handles GitHub Enterprise (e.g., ghe.spotify.net)
 REPO=""
-GH_HOST_FOR_CLONE="github.com"
 if [[ "$PR" =~ ^https?://([^/]+)/([^/]+/[^/]+)/pull/([0-9]+) ]]; then
   # Extract host, repo, and PR number from full URL
   DETECTED_HOST="${BASH_REMATCH[1]}"
   REPO="${BASH_REMATCH[2]}"
   PR_NUMBER="${BASH_REMATCH[3]}"
-  GH_HOST_FOR_CLONE="$DETECTED_HOST"
   if [[ "$DETECTED_HOST" != "github.com" ]]; then
     export GH_HOST="$DETECTED_HOST"
     echo "Detected GitHub Enterprise host: $GH_HOST"
@@ -81,10 +79,8 @@ else
   REPO="$GH_REPO"
   echo "Using repo from GH_REPO: $REPO"
 
-  # Detect host from GH_HOST or default to github.com
   if [[ -n "${GH_HOST:-}" ]]; then
     echo "Using GitHub Enterprise host: $GH_HOST"
-    GH_HOST_FOR_CLONE="$GH_HOST"
   fi
 fi
 
@@ -99,48 +95,20 @@ DIFF="$(gh pr diff "$PR" -R "$REPO")"
 echo "PR: $TITLE"
 echo "Branch: $HEAD_REF -> $BASE_REF"
 
-# Clone the repo to a temp directory so AI can explore the codebase
-TEMP_DIR=$(mktemp -d)
-CLONE_URL="git@${GH_HOST_FOR_CLONE}:${REPO}.git"
-
-echo "Cloning repo to temp directory for codebase exploration..."
-echo "Clone URL: $CLONE_URL"
-
-# Use shallow clone with the PR's head branch for speed
-if ! git clone --depth 50 --branch "$HEAD_REF" "$CLONE_URL" "$TEMP_DIR" 2>/dev/null; then
-  # If branch clone fails (might be from a fork), try default branch and fetch the PR
-  echo "Direct branch clone failed, trying default branch..."
-  git clone --depth 50 "$CLONE_URL" "$TEMP_DIR"
-  cd "$TEMP_DIR"
-  # Fetch the PR ref
-  git fetch origin "pull/${PR}/head:pr-${PR}" --depth 50 2>/dev/null || true
-  git checkout "pr-${PR}" 2>/dev/null || echo "Warning: Could not checkout PR branch, using default branch"
-fi
-
-cd "$TEMP_DIR"
-echo "Cloned to: $TEMP_DIR"
-echo "Current branch: $(git branch --show-current 2>/dev/null || echo 'detached HEAD')"
-
-# Cleanup function
-cleanup() {
-  echo "Cleaning up temp directory..."
-  rm -rf "$TEMP_DIR"
-}
-trap cleanup EXIT
-
 # Build the review prompt
+# No repo clone — the AI uses codesearch MCP to explore the codebase on demand.
+# This avoids slow clones for monorepos.
 REVIEW_PROMPT='You are a senior engineer doing a GitHub PR review.
 
-IMPORTANT: You have access to the full codebase via your file reading tools. USE THEM.
-Do not just review the diff in isolation - explore the codebase to do a thorough review.
+IMPORTANT: Use codesearch MCP (search_code, read_file) to explore the codebase for context.
+Do not just review the diff in isolation — search for related code, conventions, and guidelines.
 
-## Before You Start - Read the Codebase
+## Before You Start - Gather Context
 
-1. Read CLAUDE.md in the repository root (use your file reading tools)
-2. Follow any links to documentation referenced in CLAUDE.md and read those too
-3. Check for AGENTS.md or similar guideline files
-4. Look at files in the same directory as the changed files to understand conventions
-5. Find similar implementations elsewhere in the codebase for comparison
+1. Use codesearch to find and read CLAUDE.md or AGENTS.md in the repo
+2. Follow any links to documentation referenced in those files
+3. Search for files in the same directories as the changed files to understand conventions
+4. Search for similar implementations elsewhere in the codebase for comparison
 
 ## Review Criteria
 
@@ -233,15 +201,10 @@ echo ""
 
 case "$PROVIDER" in
   claude)
-    # Claude CLI uses -p for headless mode, --model to specify model
-    # Running from the cloned repo directory so Claude can explore the codebase
     echo "$CONTEXT" | claude -p --model claude-opus-4-5 "Write the PR review." | tee "$OUTPUT_FILE"
     ;;
   codex)
-    # Codex CLI uses exec for headless mode
-    # Use -o to write just the final response to file (avoids verbose progress output)
-    # Running from the cloned repo directory so Codex can explore the codebase
-    echo "$CONTEXT" | codex exec --model gpt-5.3-codex -o "$OUTPUT_FILE" "Write the PR review."
+    echo "$CONTEXT" | codex exec --model gpt-5.3-codex --skip-git-repo-check -o "$OUTPUT_FILE" "Write the PR review."
     cat "$OUTPUT_FILE"
     ;;
 esac
