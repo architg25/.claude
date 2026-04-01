@@ -2,19 +2,38 @@
 set -euo pipefail
 
 # Usage:
-#   ./ai-pr-review.sh <provider> <PR_URL_or_number> [--post]
+#   ./ai-pr-review.sh <provider> <PR_URL_or_number> [--model MODEL] [--effort EFFORT] [--post]
 # Providers: claude, codex
 # Examples:
 #   ./ai-pr-review.sh claude 123
 #   ./ai-pr-review.sh codex https://github.com/org/repo/pull/123 --post
-#   ./ai-pr-review.sh codex 123 --post
+#   ./ai-pr-review.sh codex 123 --model gpt-5.4 --effort high --post
 
-PROVIDER="${1:-}"
-PR="${2:-}"
-POST="${3:-}"
+PROVIDER=""
+PR=""
+POST=""
+MODEL=""
+EFFORT=""
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --post) POST="--post"; shift ;;
+    --model) MODEL="$2"; shift 2 ;;
+    --effort) EFFORT="$2"; shift 2 ;;
+    *)
+      if [[ -z "$PROVIDER" ]]; then
+        PROVIDER="$1"
+      elif [[ -z "$PR" ]]; then
+        PR="$1"
+      fi
+      shift
+      ;;
+  esac
+done
 
 if [[ -z "$PROVIDER" ]] || [[ -z "$PR" ]]; then
-  echo "Usage: $0 <provider> <PR_URL_or_number> [--post]" >&2
+  echo "Usage: $0 <provider> <PR_URL_or_number> [--model MODEL] [--effort EFFORT] [--post]" >&2
   echo "Providers: claude, codex" >&2
   exit 2
 fi
@@ -203,12 +222,26 @@ echo "Working directory: $(pwd)"
 echo "Output file: $OUTPUT_FILE"
 echo ""
 
+# Build provider-specific CLI args
+CLAUDE_MODEL_ARG=""
+CODEX_MODEL_ARG=""
+CODEX_EFFORT_ARG=""
+
+if [[ -n "$MODEL" ]]; then
+  CLAUDE_MODEL_ARG="--model $MODEL"
+  CODEX_MODEL_ARG="-m $MODEL"
+fi
+
+if [[ -n "$EFFORT" ]]; then
+  CODEX_EFFORT_ARG="--effort $EFFORT"
+fi
+
 case "$PROVIDER" in
   claude)
-    claude -p --model claude-opus-4-6 < "$CONTEXT_FILE" | tee "$OUTPUT_FILE"
+    claude -p $CLAUDE_MODEL_ARG < "$CONTEXT_FILE" | tee "$OUTPUT_FILE"
     ;;
   codex)
-    codex exec --full-auto -m gpt-5.4 --effort high --skip-git-repo-check -o "$OUTPUT_FILE" < "$CONTEXT_FILE"
+    codex exec --full-auto $CODEX_MODEL_ARG $CODEX_EFFORT_ARG --skip-git-repo-check -o "$OUTPUT_FILE" < "$CONTEXT_FILE"
     cat "$OUTPUT_FILE"
     ;;
 esac
