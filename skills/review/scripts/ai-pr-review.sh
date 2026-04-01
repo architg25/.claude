@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Usage:
-#   ./ai-pr-review.sh <provider> <PR_URL_or_number> [--model MODEL] [--effort EFFORT] [--post]
+# Usage (called by /review skill):
+#   ./ai-pr-review.sh <provider> <PR_URL> [--claude-model MODEL] [--codex-model MODEL] [--post]
 # Providers: claude, codex
 # Examples:
-#   ./ai-pr-review.sh claude 123
+#   ./ai-pr-review.sh claude https://github.com/org/repo/pull/123
 #   ./ai-pr-review.sh codex https://github.com/org/repo/pull/123 --post
-#   ./ai-pr-review.sh codex 123 --codex-model gpt-5.4-mini --post
+#   ./ai-pr-review.sh codex https://github.com/org/repo/pull/123 --codex-model gpt-5.4-mini --post
 
 PROVIDER=""
 PR=""

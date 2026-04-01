@@ -10,6 +10,7 @@ Classify every task as **Simple** or **Complex** before spawning subagents or se
 - Single-file checks or confirmations
 - Direct relationship queries: "X uses Y", "what calls Z"
 - Factual retrieval with one clear answer
+- Docs-only, config-only, or metadata-only changes (ownership, README, yaml tweaks)
 
 ### Complex Signals
 
@@ -27,7 +28,7 @@ When unsure, **default to Complex**. Overestimating complexity wastes a bit of c
 ## Model Mapping
 
 | Tier    | Claude (`--claude-model`) | Codex (`--codex-model` / `-m`) |
-| ------- |---------------------------| ------------------------------ |
+| ------- | ------------------------- | ------------------------------ |
 | Simple  | `sonnet`                  | `gpt-5.4-mini`                 |
 | Complex | `opus`                    | `gpt-5.4`                      |
 

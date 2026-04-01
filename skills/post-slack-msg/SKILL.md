@@ -110,33 +110,35 @@ If the message contains factual claims about code, architecture, services, or be
 
 ### Step 6: Codex Independent Review
 
-Dispatch Codex to independently review the message and destination:
+Dispatch Codex to independently review the message and destination. Use `shared:complexity-assessment` (Simple tier) for model selection and `shared:codex-dispatch` for CLI flags.
 
 ```bash
-SLACK_DIR="/tmp/slack-review-$(date +%s)" && mkdir -p "$SLACK_DIR" && codex exec --full-auto -m <Codex model from shared:codex-dispatch — Slack review is Simple tier> --skip-git-repo-check -o "$SLACK_DIR/review.md" "Review this Slack message for issues before posting.
+SLACK_DIR="/tmp/slack-review-$(date +%s)" && mkdir -p "$SLACK_DIR" && codex exec --full-auto -m <model> --skip-git-repo-check -o "$SLACK_DIR/review.md" "<review prompt>"
+```
 
-MESSAGE:
-<paste full message text>
+**Review prompt:**
 
+```
+Review this Slack message for issues before posting.
+
+MESSAGE: <full message text>
 DESTINATION: <channel/DM + thread if applicable>
 CONTEXT: <1-2 sentences on what the conversation was about>
 
 Check for:
-1. Wrong audience — is this message appropriate for this channel/person? Would it make sense to someone reading the channel?
-2. Tone mismatch — too casual for an incident channel? too formal for team chat? off-putting?
-3. Missing context — would readers need background to understand this? Are there implicit references that won't land?
+1. Wrong audience — appropriate for this channel/person?
+2. Tone mismatch — too casual/formal for the context?
+3. Missing context — would readers need background?
 4. Anything else that looks off
 
-Note: Sensitive data and factual claims have already been checked. Focus on audience, tone, and clarity.
+Note: Sensitive data and factual claims already checked. Focus on audience, tone, clarity.
 
-Report: List any issues found, or confirm 'No issues found' if clean."
+Report: List issues found, or 'No issues found' if clean.
 ```
 
 Read the Codex output. If issues found, fix them before proceeding.
 
-**Codex fallback:** If Codex is unavailable, use a Claude subagent with the same review prompt. See `shared:codex-dispatch` for the full pattern.
-
-**Output validation:** Verify the output file exists and is non-empty before reading. If Codex failed, note it in the verification summary but don't block the post — the other checks still ran.
+**Fallback and output validation:** See `shared:dual-agent-dispatch` for Codex fallback (use Claude subagent if unavailable) and output validation (check file exists and non-empty). If Codex failed, note it in the verification summary but don't block the post — the other checks still ran.
 
 ### Step 7: Present to User for Approval
 

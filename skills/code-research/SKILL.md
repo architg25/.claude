@@ -15,33 +15,32 @@ Dispatch multiple parallel researchers (Claude subagents + Codex instances) to i
 
 ## When NOT to Use
 
-Don't use this for questions answerable with a single tool call:
+If you can answer it with one Grep or Glob, don't spawn 4 agents:
 
-- "Where is class Foo defined?" → just use Grep
-- "What files import X?" → just use Grep
-- "Show me the config file" → just use Glob + Read
-
-Rule of thumb: if you can answer it with one Grep or Glob, don't spawn 4 agents.
+- "Where is class Foo defined?" → Grep
+- "What files import X?" → Grep
+- "Show me the config file" → Glob + Read
 
 ## Instructions
 
 ### Step 0: Assess complexity
 
-Assess the question using the criteria in `shared:complexity-assessment`.
+Use `shared:complexity-assessment` for tier and model selection. This determines researcher count:
 
-This determines **model selection**. Do not artificially limit researcher count — use as many angles as the question needs.
+- **Simple:** 1-2 researchers
+- **Complex:** 3-4 researchers
 
-### Step 1: Decompose the question into research angles
+### Step 1: Decompose into research angles
 
-Break the user's question into 3-4 focused sub-questions that attack it from different angles. Each angle should be narrow enough to finish fast.
+Break the question into focused sub-questions. Each angle should be narrow enough to finish fast.
 
 Example for "how does Padme get video files written to its DB":
 
-- **Angle 1** (local code): Find Padme's DB write paths, models, and storage layer
-- **Angle 2** (cross-repo): Find upstream services/jobs that call Padme's write APIs
-- **Angle 3** (data flow): Trace the video file from ingestion to DB row — what transformations happen?
+- **Angle 1** (local code): Padme's DB write paths, models, storage layer
+- **Angle 2** (cross-repo): upstream services/jobs that call Padme's write APIs
+- **Angle 3** (data flow): video file from ingestion to DB row — transformations?
 
-Tailor the angles to the question. Common splits:
+Common angle splits:
 
 - **Local code** vs **cross-repo** (codesearch MCP)
 - **Producer** vs **consumer** sides of a flow
@@ -50,7 +49,7 @@ Tailor the angles to the question. Common splits:
 
 ### Step 2: Build research prompts
 
-For each angle, construct a focused prompt using this template:
+For each angle:
 
 ```
 RESEARCH ANGLE: <angle description>
@@ -58,89 +57,45 @@ CONTEXT: <user's original question>
 
 You are a codebase researcher. Answer the angle above thoroughly.
 
-Instructions:
 - Search broadly first, then drill into specifics
 - Look at actual code, not just file names
 - Include file paths and line numbers for key findings
-- Note any assumptions or gaps in your findings
+- Note any assumptions or gaps
 
-Write your findings as a structured report with:
-1. **Summary** - Direct answer in 2-3 sentences
-2. **Key Findings** - Detailed evidence with file paths and code references
-3. **Data Flow** - How data moves through the system (if applicable)
-4. **Open Questions** - Anything you couldn't determine
+Report:
+1. **Summary** — Direct answer in 2-3 sentences
+2. **Key Findings** — Detailed evidence with file paths
+3. **Data Flow** — How data moves (if applicable)
+4. **Open Questions** — What you couldn't determine
 ```
 
-### Step 3: Dispatch all researchers in a SINGLE message
+For cross-repo angles, explicitly tell the agent to use codesearch MCP (`search_code` tool).
 
-Create the output directory and launch all agents concurrently. All tool calls MUST be in the same message.
+### Step 3: Dispatch all researchers
 
-**You MUST use both Claude subagents AND Codex instances.** Do not use only Claude subagents. Codex has MCP access (including codesearch) and can explore codebases independently. Using a different model family acts as a cross-check — if Claude and Codex agree, confidence is high; if they disagree, you know where to dig deeper during synthesis.
+Per `shared:dual-agent-dispatch`: launch Claude subagents + Codex instances in parallel, all in a single message.
 
-**Minimum mix:** At least 1 Codex instance and at least 1 Claude subagent. For 3-4 researchers, use 2 of each.
+**Minimum mix:** at least 1 Codex + 1 Claude subagent. For 3-4 researchers, use 2 of each.
 
-**Naming convention:** Prefix every researcher name with `claude-` or `codex-` so the synthesis output clearly shows which model produced which findings.
+Name each researcher: `claude-<angle>`, `codex-<angle>` (e.g., `claude-local-code`, `codex-data-flow`).
 
-| Researcher      | Tool                                          | Name example        |
-| --------------- | --------------------------------------------- | ------------------- |
-| Claude subagent | Agent tool (`run_in_background: true`)        | `claude-local-code` |
-| Claude subagent | Agent tool (`run_in_background: true`)        | `claude-cross-repo` |
-| Codex instance  | Bash `codex exec` (`run_in_background: true`) | `codex-data-flow`   |
-| Codex instance  | Bash `codex exec` (`run_in_background: true`) | `codex-api-surface` |
+If in a git repo, add `-C /path/to/repo` to Codex. If NOT in a repo, add `--skip-git-repo-check`.
 
-**Claude subagent launch:**
+### Step 4: Synthesize
 
-```
-Agent tool:
-  subagent_type: "general-purpose"
-  prompt: <focused research prompt for this angle>
-  run_in_background: true
-  name: "claude-<angle>"  (e.g. "claude-local-code", "claude-cross-repo")
-  model: "haiku" or "opus"  (from Step 0)
-```
+Per `shared:dual-agent-dispatch` synthesis pattern. Combine all findings:
 
-**Codex launch:**
+1. **Consensus** — multiple researchers agree (highest confidence)
+2. **Unique findings** — only one found it (include, note single-source)
+3. **Conflicts** — investigate yourself before presenting
+4. **Gaps** — what nobody could answer
 
-```bash
-RESEARCH_DIR="/tmp/research-$(date +%s)" && mkdir -p "$RESEARCH_DIR" && codex exec --full-auto -m <model> -o "$RESEARCH_DIR/codex-<angle>.md" "<focused research prompt>"
-```
+Consolidate duplicate findings — don't repeat the same evidence from multiple researchers.
 
-Use `shared:codex-dispatch` for the dispatch pattern and model selection (based on Step 0 tier).
-
-If in a git repo, add `-C /path/to/repo`. If NOT in a repo, add `--skip-git-repo-check`.
-
-Use `run_in_background: true` on the Bash tool call. Use distinct output files per angle: `codex-data-flow.md`, `codex-api-surface.md`, etc.
-
-**Codex fallback:** If Codex is unavailable (command not found), use a Claude subagent instead with the same prompt. See `shared:codex-dispatch` for the full pattern.
-
-**Output validation:** After Codex completes, verify the output file exists and is non-empty before reading. If missing or empty, note the failure and synthesize from remaining agents.
-
-### Step 4: Collect and synthesize
-
-Once all researchers complete:
-
-1. Read Codex outputs from `$RESEARCH_DIR/codex-*.md` (named by angle)
-2. Claude subagent results come back directly
-
-Combine all findings into a single answer:
-
-1. **Consensus** — Facts multiple researchers agree on (highest confidence)
-2. **Unique findings** — Insights only one researcher found
-3. **Conflicts** — Where they disagree (investigate these yourself before presenting)
-4. **Gaps** — Questions no one could answer
-
-When multiple researchers find the same thing, consolidate — don't repeat the same evidence three times. Credit the finding once and note that multiple researchers confirmed it.
-
-Present the synthesis directly to the user. Lead with the answer, then supporting evidence.
-
-### Step 5: Save output
-
-Save the synthesized report to `$RESEARCH_DIR/synthesis.md` for reference.
+Present synthesis directly. Lead with the answer, then evidence. Save to `/tmp/research-<timestamp>/synthesis.md`.
 
 ## Tips
 
-- If one researcher fails, synthesize from the others — partial results are still valuable.
-- For cross-repo questions, make sure at least one Claude subagent's prompt explicitly says to use codesearch MCP (`search_code` tool).
-- For questions about a specific repo, point Codex at it with `-C`.
-- If a researcher hangs or returns empty/garbage, note it in synthesis and move on. Don't block the whole research on one failing agent.
-- If Codex is unavailable, fall back to Claude subagents. See `shared:codex-dispatch`.
+- One researcher fails? Synthesize from the others.
+- For cross-repo questions, ensure at least one prompt mentions codesearch MCP.
+- If a researcher returns empty/garbage, note it and move on. Don't block everything.
