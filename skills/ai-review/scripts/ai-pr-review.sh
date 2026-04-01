@@ -101,7 +101,7 @@ echo "Branch: $HEAD_REF -> $BASE_REF"
 
 # Clone the repo to a temp directory so AI can explore the codebase
 TEMP_DIR=$(mktemp -d)
-CLONE_URL="https://${GH_HOST_FOR_CLONE}/${REPO}.git"
+CLONE_URL="git@${GH_HOST_FOR_CLONE}:${REPO}.git"
 
 echo "Cloning repo to temp directory for codebase exploration..."
 echo "Clone URL: $CLONE_URL"
