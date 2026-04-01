@@ -234,6 +234,8 @@ if [[ -n "$CODEX_MODEL" ]]; then
   CODEX_MODEL_ARG="-m $CODEX_MODEL"
 fi
 
+START_TIME=$(date +%s)
+
 case "$PROVIDER" in
   claude)
     claude -p $CLAUDE_MODEL_ARG < "$CONTEXT_FILE" | tee "$OUTPUT_FILE"
@@ -243,6 +245,10 @@ case "$PROVIDER" in
     cat "$OUTPUT_FILE"
     ;;
 esac
+
+ELAPSED=$(( $(date +%s) - START_TIME ))
+echo ""
+echo "[$PROVIDER] Review completed in ${ELAPSED}s"
 
 if [[ "$POST" == "--post" ]]; then
   # Post as a PR comment (needs gh auth + permission to comment)
