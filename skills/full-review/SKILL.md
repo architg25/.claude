@@ -1,6 +1,7 @@
 ---
 name: full-review
 description: "Run a comprehensive PR review using Claude and Codex in parallel. Synthesizes independent reviews into actionable feedback."
+allowed-tools: Read, Glob, Grep, Bash, Agent, mcp__code-search__search_code, mcp__code-search__read_file, mcp__code-search__count_matches
 ---
 
 # Full PR Review
