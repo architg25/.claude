@@ -40,7 +40,7 @@ Use `--post` to automatically post the synthesized review as a PR comment after 
 
 ### Step 1: Determine model and effort
 
-Assess the PR complexity and select models. Use `shared:complexity-assessment` for the tier (Simple or Complex) and Claude model. Use `shared:codex-dispatch` for the Codex model. Pass both via `--claude-model` and `--codex-model` to the script.
+Assess the PR complexity and select models. You MUST read `shared:complexity-assessment` and `shared:codex-dispatch` before selecting models. Do NOT use model names from memory — read the actual tables. Use `shared:complexity-assessment` for the tier (Simple or Complex) and Claude model. Use `shared:codex-dispatch` for the Codex model. Pass both via `--claude-model` and `--codex-model` to the script.
 
 ### Step 2: Run the parallel reviews
 

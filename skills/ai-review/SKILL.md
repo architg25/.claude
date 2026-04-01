@@ -63,7 +63,7 @@ npm i -g @openai/codex
 
 ## Instructions
 
-Run the ai-pr-review.sh script from this skill's scripts directory. Use `shared:complexity-assessment` for the tier and Claude model, `shared:codex-dispatch` for the Codex model. Pass via `--claude-model` and `--codex-model`.
+Run the ai-pr-review.sh script from this skill's scripts directory. You MUST read `shared:complexity-assessment` and `shared:codex-dispatch` before selecting models. Do NOT use model names from memory — read the actual tables. Use `shared:complexity-assessment` for the tier and Claude model, `shared:codex-dispatch` for the Codex model. Pass via `--claude-model` and `--codex-model`.
 
 ```bash
 scripts/ai-pr-review.sh <provider> <PR_URL> [--claude-model MODEL] [--codex-model MODEL] [--post]
