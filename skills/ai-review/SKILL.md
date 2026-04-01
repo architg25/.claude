@@ -111,5 +111,5 @@ This allows running reviews for multiple PRs simultaneously.
 
 ## Models Used
 
-- **Claude**: claude-opus-4-5
-- **Codex**: gpt-5.3-codex
+- **Claude**: claude-opus-4-6
+- **Codex**: gpt-5.4 (with `--effort high`)

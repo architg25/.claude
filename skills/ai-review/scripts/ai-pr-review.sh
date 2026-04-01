@@ -184,11 +184,15 @@ $REVIEW_PROMPT
 EOF
 )
 
-# Create unique output directory per PR
+# Create unique output directory per PR and write context to a file
+# (avoids shell argument length limits for large diffs)
 OUTPUT_DIR="/tmp/pr-review-${PR}"
 mkdir -p "$OUTPUT_DIR"
 OUTPUT_FILE="${OUTPUT_DIR}/${PROVIDER}.md"
 > "$OUTPUT_FILE"  # Clear stale content from previous runs
+
+CONTEXT_FILE="${OUTPUT_DIR}/context-${PROVIDER}.txt"
+echo "$CONTEXT" > "$CONTEXT_FILE"
 
 # Unset CLAUDECODE so spawned claude processes don't think they're nested sessions
 unset CLAUDECODE
@@ -201,10 +205,10 @@ echo ""
 
 case "$PROVIDER" in
   claude)
-    echo "$CONTEXT" | claude -p --model claude-opus-4-5 "Write the PR review." | tee "$OUTPUT_FILE"
+    claude -p --model claude-opus-4-6 < "$CONTEXT_FILE" | tee "$OUTPUT_FILE"
     ;;
   codex)
-    echo "$CONTEXT" | codex exec --model gpt-5.3-codex --skip-git-repo-check -o "$OUTPUT_FILE" "Write the PR review."
+    codex exec --full-auto -m gpt-5.4 --effort high --skip-git-repo-check -o "$OUTPUT_FILE" < "$CONTEXT_FILE"
     cat "$OUTPUT_FILE"
     ;;
 esac
