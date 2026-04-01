@@ -113,7 +113,7 @@ If the message contains factual claims about code, architecture, services, or be
 Dispatch Codex to independently review the message and destination:
 
 ```bash
-SLACK_DIR="/tmp/slack-review-$(date +%s)" && mkdir -p "$SLACK_DIR" && codex exec --full-auto -m gpt-5.4-mini --skip-git-repo-check -o "$SLACK_DIR/review.md" "Review this Slack message for issues before posting.
+SLACK_DIR="/tmp/slack-review-$(date +%s)" && mkdir -p "$SLACK_DIR" && codex exec --full-auto -m <Simple tier Codex model from shared:complexity-assessment> --skip-git-repo-check -o "$SLACK_DIR/review.md" "Review this Slack message for issues before posting.
 
 MESSAGE:
 <paste full message text>

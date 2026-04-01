@@ -7,7 +7,7 @@ set -euo pipefail
 # Examples:
 #   ./ai-pr-review.sh claude 123
 #   ./ai-pr-review.sh codex https://github.com/org/repo/pull/123 --post
-#   ./ai-pr-review.sh codex 123 --model gpt-5.4 --effort high --post
+#   ./ai-pr-review.sh codex 123 --codex-model gpt-5.4-mini --post
 
 PROVIDER=""
 PR=""

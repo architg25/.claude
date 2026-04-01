@@ -143,10 +143,10 @@ Same format as critical issues.
 
 ### Step 3: Dispatch Codex
 
-Use the `shared:codex-dispatch` pattern. Always use the stronger model — code review benefits from reasoning.
+Assess the diff using `shared:complexity-assessment` and use the appropriate Codex model. Use `shared:codex-dispatch` for the dispatch pattern.
 
 ```bash
-codex exec --full-auto -m gpt-5.4 -C "$(git rev-parse --show-toplevel)" -o "$REVIEW_DIR/codex-review.md" "<review prompt referencing $REVIEW_DIR/diff.patch>"
+codex exec --full-auto -m <model from complexity-assessment> -C "$(git rev-parse --show-toplevel)" -o "$REVIEW_DIR/codex-review.md" "<review prompt referencing $REVIEW_DIR/diff.patch>"
 ```
 
 Run with `run_in_background: true` on the Bash tool.
