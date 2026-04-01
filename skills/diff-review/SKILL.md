@@ -1,7 +1,7 @@
 ---
 name: diff-review
 description: Use when about to create or edit a PR, or when the user wants a pre-PR diff review. Triggers on "review my diff", "check my changes before PR", "diff review", or before invoking engineering:pr-description or engineering:ship.
-allowed-tools: Read, Glob, Grep, Bash, mcp__code-search__search_code, mcp__code-search__read_file, mcp__code-search__count_matches
+allowed-tools: Read, Glob, Grep, Bash(bash *), Bash(codex *), Bash(git *), Bash(mkdir *), mcp__code-search__search_code, mcp__code-search__read_file, mcp__code-search__count_matches
 ---
 
 # Diff Review

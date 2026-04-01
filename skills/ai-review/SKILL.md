@@ -1,7 +1,7 @@
 ---
 name: ai-review
 description: "Run an AI-powered PR review using Claude or Codex CLI. Reviews the PR diff against project guidelines."
-allowed-tools: Read, Glob, Grep, Bash, mcp__code-search__search_code, mcp__code-search__read_file, mcp__code-search__count_matches
+allowed-tools: Read, Glob, Grep, Bash(bash *), Bash(gh *), mcp__code-search__search_code, mcp__code-search__read_file, mcp__code-search__count_matches
 ---
 
 # AI PR Review
