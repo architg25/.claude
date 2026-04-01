@@ -27,9 +27,9 @@ When unsure, **default to Complex**. Overestimating complexity wastes a bit of c
 ## Model Mapping
 
 | Tier    | Claude (`--claude-model`) | Codex (`--codex-model` / `-m`) |
-| ------- | ------------------------- | ------------------------------ |
-| Simple  | `claude-sonnet-4-6`       | `gpt-5.4-mini`                 |
-| Complex | `claude-opus-4-6`         | `gpt-5.4`                      |
+| ------- |---------------------------| ------------------------------ |
+| Simple  | `sonnet`                  | `gpt-5.4-mini`                 |
+| Complex | `opus`                    | `gpt-5.4`                      |
 
 > Model IDs will change over time. Update this table when new models are available. The key principle is: **use cheaper/faster models for simple tasks, stronger models for complex ones.**
 
