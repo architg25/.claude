@@ -40,7 +40,7 @@ Use `--post` to automatically post the synthesized review as a PR comment after 
 
 ### Step 1: Determine model and effort
 
-Code review is always **Complex** tier. Read `shared:complexity-assessment` to get the current Codex model and effort flags. Pass them as `--model` and `--effort` to the script.
+Assess the PR using `shared:complexity-assessment` to determine the tier (Simple or Complex). Use the PR title, description, and diff size as signals. Pass the appropriate models to the script.
 
 ### Step 2: Run the parallel reviews
 
