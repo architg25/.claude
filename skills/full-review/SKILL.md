@@ -47,10 +47,8 @@ Code review is always **Complex** tier. Read `shared:complexity-assessment` to g
 Run the full-pr-review.sh script from this skill's scripts directory:
 
 ```bash
-scripts/full-pr-review.sh <PR_URL> --model <CODEX_MODEL> --effort <EFFORT> [--post]
+scripts/full-pr-review.sh <PR_URL> --claude-model <CLAUDE_MODEL> --codex-model <CODEX_MODEL> [--post]
 ```
-
-The `--model` flag is used for Codex only (Claude uses its own default). The `--effort` flag is passed to Codex's `--effort`.
 
 **Getting the PR URL:**
 

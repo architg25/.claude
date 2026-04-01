@@ -12,15 +12,15 @@ set -euo pipefail
 
 PR=""
 POST=""
-MODEL=""
-EFFORT=""
+CLAUDE_MODEL=""
+CODEX_MODEL=""
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --post) POST="--post"; shift ;;
-    --model) MODEL="$2"; shift 2 ;;
-    --effort) EFFORT="$2"; shift 2 ;;
+    --claude-model) CLAUDE_MODEL="$2"; shift 2 ;;
+    --codex-model) CODEX_MODEL="$2"; shift 2 ;;
     *)
       if [[ -z "$PR" ]]; then
         PR="$1"
@@ -32,8 +32,8 @@ done
 
 # Build passthrough flags for ai-pr-review.sh
 MODEL_ARGS=""
-if [[ -n "$MODEL" ]]; then MODEL_ARGS="--model $MODEL"; fi
-if [[ -n "$EFFORT" ]]; then MODEL_ARGS="$MODEL_ARGS --effort $EFFORT"; fi
+if [[ -n "$CLAUDE_MODEL" ]]; then MODEL_ARGS="$MODEL_ARGS --claude-model $CLAUDE_MODEL"; fi
+if [[ -n "$CODEX_MODEL" ]]; then MODEL_ARGS="$MODEL_ARGS --codex-model $CODEX_MODEL"; fi
 
 if [[ -z "$PR" ]]; then
   echo "Usage: $0 <PR_URL> [--model MODEL] [--effort EFFORT] [--post]" >&2

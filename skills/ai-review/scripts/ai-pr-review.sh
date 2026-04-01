@@ -12,15 +12,15 @@ set -euo pipefail
 PROVIDER=""
 PR=""
 POST=""
-MODEL=""
-EFFORT=""
+CLAUDE_MODEL=""
+CODEX_MODEL=""
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --post) POST="--post"; shift ;;
-    --model) MODEL="$2"; shift 2 ;;
-    --effort) EFFORT="$2"; shift 2 ;;
+    --claude-model) CLAUDE_MODEL="$2"; shift 2 ;;
+    --codex-model) CODEX_MODEL="$2"; shift 2 ;;
     *)
       if [[ -z "$PROVIDER" ]]; then
         PROVIDER="$1"
@@ -33,7 +33,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ -z "$PROVIDER" ]] || [[ -z "$PR" ]]; then
-  echo "Usage: $0 <provider> <PR_URL_or_number> [--model MODEL] [--effort EFFORT] [--post]" >&2
+  echo "Usage: $0 <provider> <PR_URL_or_number> [--claude-model MODEL] [--codex-model MODEL] [--post]" >&2
   echo "Providers: claude, codex" >&2
   exit 2
 fi
@@ -225,15 +225,13 @@ echo ""
 # Build provider-specific CLI args
 CLAUDE_MODEL_ARG=""
 CODEX_MODEL_ARG=""
-CODEX_EFFORT_ARG=""
 
-if [[ -n "$MODEL" ]]; then
-  CLAUDE_MODEL_ARG="--model $MODEL"
-  CODEX_MODEL_ARG="-m $MODEL"
+if [[ -n "$CLAUDE_MODEL" ]]; then
+  CLAUDE_MODEL_ARG="--model $CLAUDE_MODEL"
 fi
 
-if [[ -n "$EFFORT" ]]; then
-  CODEX_EFFORT_ARG="--effort $EFFORT"
+if [[ -n "$CODEX_MODEL" ]]; then
+  CODEX_MODEL_ARG="-m $CODEX_MODEL"
 fi
 
 case "$PROVIDER" in
@@ -241,7 +239,7 @@ case "$PROVIDER" in
     claude -p $CLAUDE_MODEL_ARG < "$CONTEXT_FILE" | tee "$OUTPUT_FILE"
     ;;
   codex)
-    codex exec --full-auto $CODEX_MODEL_ARG $CODEX_EFFORT_ARG --skip-git-repo-check -o "$OUTPUT_FILE" < "$CONTEXT_FILE"
+    codex exec --full-auto $CODEX_MODEL_ARG --skip-git-repo-check -o "$OUTPUT_FILE" < "$CONTEXT_FILE"
     cat "$OUTPUT_FILE"
     ;;
 esac
