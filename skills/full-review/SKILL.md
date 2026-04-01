@@ -1,11 +1,11 @@
 ---
 name: full-review
-description: "Run a comprehensive PR review using Claude and Codex in parallel. Synthesizes independent reviews into actionable feedback."
+description: "Run a comprehensive PR review using Claude, Codex, and Gemini in parallel. Synthesizes independent reviews into actionable feedback."
 ---
 
 # Full PR Review
 
-Run a comprehensive code review on a GitHub PR using two AI reviewers in parallel: Claude (standard review) and Codex (adversarial review). Each reviewer independently analyzes the PR, then you synthesize their findings.
+Run a comprehensive code review on a GitHub PR using three AI reviewers in parallel: Claude, Codex, and Gemini. Each reviewer independently analyzes the PR, then you synthesize their findings.
 
 ## Usage
 
@@ -14,169 +14,114 @@ Run a comprehensive code review on a GitHub PR using two AI reviewers in paralle
 ```
 
 **IMPORTANT**: Always use full PR URLs (e.g., `https://github.com/org/repo/pull/123`).
+The script needs the full URL to know which repo to clone.
 
 Use `--post` to automatically post the synthesized review as a PR comment after synthesis.
+
 
 ## Policy / Safety
 
 **Enterprise authentication required:**
+- All two providers (Claude, Codex) must use Spotify enterprise accounts
+- Do not use personal API keys for internal Spotify repositories
 
-- Both providers (Claude, Codex) must use enterprise accounts where applicable
-- Do not use personal API keys for internal repositories
+## What This Command Does
+
+1. Runs the ai-pr-review.sh script two times in parallel (Claude, Codex)
+2. Each reviewer independently:
+    - Fetches the PR diff
+    - Reads CLAUDE.md guidelines
+    - Produces a structured review
+3. Saves reviews to separate files
+4. You then synthesize the reviews
 
 ## Instructions
 
-### Step 0: Parse the PR URL
+### Step 1: Run the parallel reviews
 
-Extract components from the URL using this regex: `^https?://([^/]+)/([^/]+/[^/]+)/pull/([0-9]+)`
-
-- `HOST` — the GitHub host (e.g., `github.com` or `ghe.example.com`)
-- `REPO` — owner/repo (e.g., `org/my-repo`)
-- `PR_NUMBER` — the PR number
-
-**GitHub Enterprise:** If `HOST` is not `github.com`, set `GH_HOST` env var for all `gh` commands:
+Run the full-pr-review.sh script from this skill's scripts directory:
 
 ```bash
-export GH_HOST="<HOST>"
+scripts/full-pr-review.sh <PR_URL> [--post]
 ```
 
-**If no URL provided:** Try to detect the current PR:
+**Getting the PR URL:**
+- If the user provides a full URL, use it directly
+- If the user provides just a PR number, you must construct the full URL
+- If no PR is specified, detect the current PR's URL:
 
 ```bash
-gh pr view --json url --jq .url
+PR_URL=$(gh pr view --json url --jq .url)
+scripts/full-pr-review.sh "$PR_URL"
 ```
 
-**If just a PR number:** Ask the user for the full URL. We need the host and repo.
+Add `--post` if the user wants to post the synthesized review as a PR comment.
 
-### Step 1: Fetch PR data
+### Step 2: Read all three reviews
 
-Fetch the diff and metadata. These work without cloning the repo — they're API calls.
+After the script completes, read the review files:
+
+```
+/tmp/claude-pr-review.md
+/tmp/codex-pr-review.md
+```
+
+### Step 3: Synthesize and investigate
+
+After reading all three reviews:
+
+1. **Identify consensus**: Issues flagged by multiple reviewers are higher priority
+2. **Note unique insights**: Each AI may catch different issues
+3. **Investigate conflicts**: If reviewers disagree, investigate the code yourself
+4. **Create a synthesis**: Combine the best insights from each review
+5. **Verify claims**: Check any specific line numbers or code references mentioned
+
+### Step 4: Post the synthesized review
+
+If the script output contains `POST_REVIEW=true`, you MUST:
+1. Save your synthesized review to `/tmp/synthesized-review.md`
+2. Post it as a PR comment using the command shown in the script output
 
 ```bash
-gh pr diff <PR_NUMBER> -R <REPO>
-gh pr view <PR_NUMBER> -R <REPO> --json title,body,baseRefName,headRefName,additions,deletions,changedFiles
+gh pr comment <PR_URL> --body-file /tmp/synthesized-review.md
 ```
 
-Save the diff to a variable for passing to reviewers.
+## Output Files
 
-### Step 2: Dispatch reviewers in parallel
+Reviews are saved to `/tmp/pr-review-<PR_NUMBER>/`:
+- `/tmp/pr-review-123/claude.md` - Claude's independent review
+- `/tmp/pr-review-123/codex.md` - Codex's independent review
+- `/tmp/pr-review-123/gemini.md` - Gemini's independent review
+- `/tmp/pr-review-123/synthesized.md` - Your synthesized review (if posting)
 
-Launch both reviewers in a SINGLE message with `run_in_background: true` on both.
+This allows running reviews for multiple PRs simultaneously.
 
-**Claude subagent (standard review):**
+## Synthesis Guidelines
 
-```
-Agent tool:
-  subagent_type: "general-purpose"
-  prompt: |
-    Review this PR diff. Focus on bugs, logic errors, edge cases, and code quality.
+When synthesizing reviews, prioritize:
 
-    PR: <REPO>#<PR_NUMBER> - <title>
-    Base: <baseRefName> <- <headRefName>
+1. **Security issues** - Any security concern from any reviewer
+2. **Bugs** - Logic errors, edge cases, null handling
+3. **Guidelines violations** - Deviations from CLAUDE.md
+4. **Performance** - Inefficiencies or scalability concerns
+5. **Code quality** - Maintainability, readability, testing
 
-    <diff content>
-
-    Produce a structured review with:
-    - Critical issues (bugs, security, data loss)
-    - Important issues (logic errors, edge cases, missing validation)
-    - Suggestions (style, readability, minor improvements)
-    Include file paths and line numbers for every finding.
-  run_in_background: true
-  name: "claude-review"
-  model: "opus"
-```
-
-**Codex rescue subagent (adversarial review):**
-
-```
-Agent tool:
-  subagent_type: "codex:codex-rescue"
-  prompt: |
-    --fresh
-    You are an adversarial code reviewer. Your job is NOT to do a standard review — it's to challenge the implementation approach, question design choices, and find what a standard reviewer would miss.
-
-    PR: <REPO>#<PR_NUMBER> - <title>
-    Base: <baseRefName> <- <headRefName>
-
-    <diff content>
-
-    Focus on:
-    - Is this the right approach? What alternatives were there?
-    - What assumptions does this code make that could break?
-    - What happens under load, with bad input, or in failure modes?
-    - Are there subtle interactions with code outside the diff?
-
-    Produce structured output:
-    - Verdict: approve | needs-attention
-    - Findings: array of { severity (critical/high/medium/low), file, line, description, recommendation }
-    - Next steps: what should the author address before merging
-  run_in_background: true
-  name: "codex-adversarial-review"
-```
-
-### Step 3: Synthesize
-
-After both reviewers complete:
-
-1. **Identify consensus**: Issues flagged by both reviewers are highest priority
-2. **Note unique insights**: Each reviewer catches different things — Claude is thorough on implementation details, Codex challenges the approach itself
-3. **Investigate conflicts**: If reviewers disagree, investigate the code yourself using the diff
-4. **Verify claims**: Spot-check specific line numbers or code references
-
-### Step 4: Present results
+Format your synthesized review as:
 
 ```markdown
 ## Synthesized PR Review
 
-**PR:** <REPO>#<PR_NUMBER>
-**Reviewers:** Claude (standard), Codex (adversarial)
+**Reviewers**: Claude, Codex, Gemini
 
 ### Critical Issues (consensus)
-
-- Issues identified by both reviewers
+- Issues identified by 2+ reviewers
 
 ### Important Issues
-
 - Significant issues from individual reviewers
 
-### Design Challenges (from adversarial review)
-
-- Approach concerns, assumption risks, alternative suggestions
-
 ### Suggestions
-
 - Minor improvements and style suggestions
 
 ### Reviewer Notes
-
 - Any conflicts or interesting differences between reviews
 ```
-
-Prioritize:
-
-1. **Security issues** — any security concern from any reviewer
-2. **Bugs** — logic errors, edge cases, null handling
-3. **Design concerns** — approach problems, bad assumptions
-4. **Performance** — inefficiencies or scalability concerns
-5. **Code quality** — maintainability, readability, testing
-
-### Step 5: Post (if --post flag)
-
-If `--post` was specified:
-
-1. Save synthesized review to `/tmp/pr-review-<PR_NUMBER>/synthesized.md`
-2. Post as PR comment:
-
-```bash
-gh pr comment <PR_NUMBER> -R <REPO> --body-file /tmp/pr-review-<PR_NUMBER>/synthesized.md
-```
-
-## Common Mistakes
-
-| Mistake                                  | Fix                                                                             |
-| ---------------------------------------- | ------------------------------------------------------------------------------- |
-| Not fetching the diff before dispatching | Both reviewers need the full diff in their prompt — fetch it first              |
-| Forgetting GH_HOST for enterprise URLs   | Parse the host from URL and export GH_HOST if not github.com                    |
-| Trusting line numbers blindly            | Reviewers hallucinate line numbers — spot-check references against the diff     |
-| Binary pass/fail synthesis               | Both reviewers can be partially right — synthesize, don't pick a winner         |
-| Skipping adversarial insights            | The adversarial review catches different things — don't dismiss design concerns |

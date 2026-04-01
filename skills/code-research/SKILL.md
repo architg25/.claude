@@ -81,12 +81,12 @@ Create the output directory and launch all agents concurrently. All tool calls M
 
 **Naming convention:** Prefix every researcher name with `claude-` or `codex-` so the synthesis output clearly shows which model produced which findings.
 
-| Researcher      | Tool                                                        | Name example        |
-| --------------- | ----------------------------------------------------------- | ------------------- |
-| Claude subagent | Agent tool (`run_in_background: true`)                      | `claude-local-code` |
-| Claude subagent | Agent tool (`run_in_background: true`)                      | `claude-cross-repo` |
-| Codex rescue    | Agent tool `codex:codex-rescue` (`run_in_background: true`) | `codex-data-flow`   |
-| Codex rescue    | Agent tool `codex:codex-rescue` (`run_in_background: true`) | `codex-api-surface` |
+| Researcher      | Tool                                          | Name example        |
+| --------------- | --------------------------------------------- | ------------------- |
+| Claude subagent | Agent tool (`run_in_background: true`)        | `claude-local-code` |
+| Claude subagent | Agent tool (`run_in_background: true`)        | `claude-cross-repo` |
+| Codex instance  | Bash `codex exec` (`run_in_background: true`) | `codex-data-flow`   |
+| Codex instance  | Bash `codex exec` (`run_in_background: true`) | `codex-api-surface` |
 
 **Claude subagent launch:**
 
@@ -101,23 +101,26 @@ Agent tool:
 
 **Codex launch:**
 
-```
-Agent tool:
-  subagent_type: "codex:codex-rescue"
-  prompt: "--fresh <focused research prompt for this angle>"
-  run_in_background: true
-  name: "codex-<angle>"  (e.g. "codex-data-flow", "codex-api-surface")
+```bash
+RESEARCH_DIR="/tmp/research-$(date +%s)" && mkdir -p "$RESEARCH_DIR" && codex exec --full-auto -m <model> -o "$RESEARCH_DIR/codex-<angle>.md" "<focused research prompt>"
 ```
 
-For complex questions (per `shared:complexity-assessment`), add `--effort high` to the prompt. For simple questions, use `--model spark`. Frame prompts as research so the rescue subagent runs read-only.
+Use `-m gpt-5.4-mini` or `-m gpt-5.4` based on Step 0.
 
-**Codex fallback:** If the rescue subagent returns a failure (Codex unavailable), fall back to a Claude subagent with the same research prompt.
+If in a git repo, add `-C /path/to/repo`. If NOT in a repo, add `--skip-git-repo-check`.
+
+Use `run_in_background: true` on the Bash tool call. Use distinct output files per angle: `codex-data-flow.md`, `codex-api-surface.md`, etc.
+
+**Codex fallback:** If Codex is unavailable (command not found), use a Claude subagent instead with the same prompt. See `shared:codex-dispatch` for the full pattern.
+
+**Output validation:** After Codex completes, verify the output file exists and is non-empty before reading. If missing or empty, note the failure and synthesize from remaining agents.
 
 ### Step 4: Collect and synthesize
 
 Once all researchers complete:
 
-1. Claude subagent and Codex rescue results both come back as agent return values — no files to read
+1. Read Codex outputs from `$RESEARCH_DIR/codex-*.md` (named by angle)
+2. Claude subagent results come back directly
 
 Combine all findings into a single answer:
 
@@ -132,11 +135,12 @@ Present the synthesis directly to the user. Lead with the answer, then supportin
 
 ### Step 5: Save output
 
-Save the synthesized report to `/tmp/research-$(date +%s)/synthesis.md` for reference.
+Save the synthesized report to `$RESEARCH_DIR/synthesis.md` for reference.
 
 ## Tips
 
 - If one researcher fails, synthesize from the others — partial results are still valuable.
 - For cross-repo questions, make sure at least one Claude subagent's prompt explicitly says to use codesearch MCP (`search_code` tool).
-- If a researcher fails, note it in synthesis and move on. Don't block the whole research on one failing agent.
-- If Codex is unavailable, fall back to Claude subagents with the same prompt.
+- For questions about a specific repo, point Codex at it with `-C`.
+- If a researcher hangs or returns empty/garbage, note it in synthesis and move on. Don't block the whole research on one failing agent.
+- If Codex is unavailable, fall back to Claude subagents. See `shared:codex-dispatch`.
