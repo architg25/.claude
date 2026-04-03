@@ -1,45 +1,38 @@
 {
-  "alwaysThinkingEnabled": true,
-  "autoDreamEnabled": false,
-  "autoMemoryEnabled": false,
-  "disableAllHooks": false,
-  "disabledMcpjsonServers": [
-    "dynamo-mcp-dev"
-  ],
-  "enableAllProjectMcpServers": true,
-  "enabledPlugins": {
-    "playground@claude-plugins-official": true,
-    "frontend-design@claude-code-plugins": true,
-    "document-skills@anthropic-agent-skills": true,
-    "superpowers@claude-plugins-official": true,
-    "cli-anything@cli-anything": true,
-    "codex@openai-codex": true
-  },
   "env": {
     "model": "claude-opus-4-6[1m]",
     "EDITOR": "zed",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
-  "extraKnownMarketplaces": {
-    "anthropic-agent-skills": {
-      "source": {
-        "source": "github",
-        "repo": "anthropics/skills"
-      }
-    },
-    "cli-anything": {
-      "source": {
-        "source": "github",
-        "repo": "HKUDS/CLI-Anything"
-      }
-    },
-    "openai-codex": {
-      "source": {
-        "source": "github",
-        "repo": "openai/codex-plugin-cc"
-      }
-    }
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": [
+      "Read",
+      "Write",
+      "Edit",
+      "MultiEdit",
+      "Grep",
+      "Glob",
+      "NotebookEdit",
+      "WebFetch",
+      "WebSearch",
+      "Skill",
+      "EnterWorktree",
+      "EnterPlanMode",
+      "TaskCreate",
+      "TaskUpdate",
+      "TaskGet",
+      "TaskList",
+      "TeamCreate",
+      "TeamDelete",
+      "SendMessage"
+    ]
   },
+  "model": "claude-opus-4-6[1m]",
+  "enableAllProjectMcpServers": true,
+  "disabledMcpjsonServers": [
+    "dynamo-mcp-dev"
+  ],
   "hooks": {
     "Notification": [
       {
@@ -222,35 +215,41 @@
       }
     ]
   },
-  "includeCoAuthoredBy": false,
-  "model": "claude-opus-4-6[1m]",
-  "permissions": {
-    "allow": [
-      "Read",
-      "Write",
-      "Edit",
-      "MultiEdit",
-      "Grep",
-      "Glob",
-      "NotebookEdit",
-      "WebFetch",
-      "WebSearch",
-      "Skill",
-      "EnterWorktree",
-      "EnterPlanMode",
-      "TaskCreate",
-      "TaskUpdate",
-      "TaskGet",
-      "TaskList",
-      "TeamCreate",
-      "TeamDelete",
-      "SendMessage"
-    ]
-  },
+  "disableAllHooks": false,
   "statusLine": {
     "type": "command",
     "command": "~/.claude/ccline/ccline",
     "padding": 0
   },
+  "enabledPlugins": {
+    "playground@claude-plugins-official": true,
+    "document-skills@anthropic-agent-skills": true,
+    "superpowers@claude-plugins-official": true,
+    "cli-anything@cli-anything": true,
+    "codex@openai-codex": true
+  },
+  "extraKnownMarketplaces": {
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    },
+    "cli-anything": {
+      "source": {
+        "source": "github",
+        "repo": "HKUDS/CLI-Anything"
+      }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
+    }
+  },
+  "alwaysThinkingEnabled": true,
+  "autoMemoryEnabled": false,
+  "autoDreamEnabled": false,
   "teammateMode": "tmux"
 }

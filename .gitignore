@@ -30,6 +30,9 @@
 # Allow CLAUDE.md
 !CLAUDE.md
 
+# Exclude env files (may contain usernames, tokens, etc.)
+.env
+
 # Exclude Python cache directories
 __pycache__/
 *.pyc
