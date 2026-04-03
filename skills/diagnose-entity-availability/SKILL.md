@@ -352,20 +352,45 @@ Prompt template:
 You are investigating a metadata-playback gap for entity <URI>.
 Triage shows availability.playability.is_playable=true, but the user reports audio/video won't play.
 Content type: <content_type>
-User: <user_id>
+User: <user_id> (country: <country>, catalogue: <catalogue>)
 
-Read ~/.claude/skills/diagnose-entity-availability/service-reference.md for exact call templates.
+Read ~/.claude/skills/diagnose-entity-availability/service-reference.md for exact call templates,
+including the "Key2 Playability Deep Dive" section for the full check flow and common scenarios.
 
-Use dynamo_discover to find the key2 service. Look for DebugService or IsPlayable endpoints. Call them to check:
-- Is the content playable according to Key2?
-- Denial reasons: COUNTRY_BLOCKED, SALE_PERIOD, FORMAT, SUSPECTED_BOOTLEGGER, CONTENT_CONTROL
-- Restriction timestamps (stale timestamps = propagation delay from Statements)
-- File ID validity
+Step 1: Use dynamo_discover to find key2 services and methods.
 
-Key2 has independent restriction data from Statements via a separate pipeline (key-ingestor). If Key2's data is stale compared to metadata, that's the root cause.
+Step 2: Call DebugService/Audio with the file ID (hex format) to get Key2's restriction state
+and timestamps. Compare timestamps with metadata — stale = propagation delay.
+
+Step 3: Call AudioKeyService/IsPlayable (or VideoKeyService/IsPlayable for video) with
+user context to test actual playability from Key2's perspective.
+
+Step 4: If Key2 denies, check the denial reason against the playability check flow:
+1. Country completely blocked?
+2. Employee/catalogue="all" bypass?
+3. Bootlegger status (free tier, from Memcache)?
+4. Sale periods match user's catalogue + country?
+5. Authorization groups via Casys (purchased/gated content)?
+6. File format allowed for subscription tier? (OGG_VORBIS_320=premium, FLAC=lossless)
+7. Abroad policy (free users must match home country)?
+8. Offline download permission?
+9. Content Control rules?
+
+Step 5: Check for common scenarios:
+- Metadata/Key2 desync: compare restriction timestamps
+- Content replacement: file ID in metadata doesn't match Key2's known files
+- Trial users: user appears as premium but has trial flags — effective catalogue may differ
+- DRM layer issues: Key2 may return OK but the DRM proxy (Widevine/FairPlay/PlayReady/PlayPlay)
+  could fail for platform-specific reasons (compromised CDM, VMP enforcement, audio denylist)
+- Client caching: client may have stale file IDs — suggest cache clear / different device
+
+Key2 never returns 404 — it always serves a fallback dead key (deadbeefdeadbeef...).
+Debug endpoints return timestamps of last restriction update — use to detect propagation delays.
 
 Report findings as:
-{service: "key2", status: "playable|denied", diagnosis: "<plain language>", evidence: {<denial reasons, timestamps>}}
+{service: "key2", status: "playable|denied", diagnosis: "<plain language>",
+ evidence: {<denial reason, restriction timestamps, format, DRM layer if relevant>},
+ common_scenario: "desync|content_replacement|trial_user|drm_issue|client_cache|none"}
 ```
 
 ## Phase 4: Synthesis
@@ -411,6 +436,12 @@ Actionable guidance based on root cause:
 - **Propagation delay:** "Wait ~30 minutes for Key2 to sync."
 - **Taken down:** "Content was taken down. Check Statements for reason."
 - **Not found:** "Entity not in Statements. Check ingestion pipeline (see debugging-missing-episode-or-show.md)."
+- **Content replacement:** "File ID mismatch — content was re-linked. Key2 may have stale file mappings."
+- **DRM layer:** "Key2 allows but DRM proxy denies — platform-specific issue (compromised CDM, VMP, audio denylist). Check DRM services reference."
+- **Trial user:** "User has trial flags — effective catalogue may differ from subscription tier."
+- **Client caching:** "Server-side looks correct. Ask user to clear cache, reinstall, or test on different device."
+- **Format restriction:** "Audio format not allowed for tier (e.g., OGG_VORBIS_320 requires premium, FLAC requires lossless)."
+- **Abroad policy:** "Free user outside home country — abroad restrictions apply."
 
 ## Gotchas
 

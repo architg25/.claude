@@ -260,23 +260,110 @@ Use `dynamo_discover` to find the service first.
 - `policy_decisions[].verdict` — VERDICT_COUNTRY_RESTRICTED, VERDICT_CATALOGUE_RESTRICTED, VERDICT_USER_LACKS_ACCESS, VERDICT_UNAVAILABLE
 - `access_info`
 
-## key2 — IsPlayable / DebugService
+## Key2 Playability Deep Dive
+
+_Sourced from [refused/skills/playability-debug](https://ghe.spotify.net/refused/skills) — adapted for dynamo-mcp (no CLI tools needed)._
 
 Use `dynamo_discover` to find key2 services and methods. Key2 exposes:
 
 - `AudioKeyService` — `GetKey`, `GetLicenseKey`, `IsPlayable`
 - `VideoKeyService` — `GetKey`, `IsPlayable`
-- `DebugService` — diagnostic endpoints
+- `DebugService` — `Audio` (restrictions by hex file_id), `Video` (restrictions by hex source_id)
 
-Call `IsPlayable` or DebugService endpoints with the entity/file context.
+### Denial Reasons
 
-**Key2 denial reasons:**
+| Reason                   | Description                                                                       |
+| ------------------------ | --------------------------------------------------------------------------------- |
+| `COUNTRY_BLOCKED`        | Entire country blocked from content                                               |
+| `SALE_PERIOD`            | Outside active sale periods, or catalogue/country combo doesn't match             |
+| `FORMAT`                 | Audio format not allowed for subscription tier (e.g., OGG_VORBIS_320 for free)    |
+| `FORMAT_LOSSLESS`        | Lossless format (FLAC) over insecure connection or without LOSSLESS audio quality |
+| `ABROAD`                 | Free/mod user outside home country                                                |
+| `DOWNLOAD_MUSIC_ON_FREE` | Free user attempting music download                                               |
+| `SUSPECTED_BOOTLEGGER`   | Bootleg client detected (98% rejection rate)                                      |
+| `CONTENT_CONTROL`        | Content Control Library denies access based on authorization attributes           |
 
-| Reason                 | Description                         |
-| ---------------------- | ----------------------------------- |
-| `COUNTRY_BLOCKED`      | Entire country blocked              |
-| `SALE_PERIOD`          | Outside active sale periods         |
-| `FORMAT`               | Audio format not allowed for tier   |
-| `FORMAT_LOSSLESS`      | Lossless without lossless tier      |
-| `SUSPECTED_BOOTLEGGER` | Bootleg client (98% rejection)      |
-| `CONTENT_CONTROL`      | CCL denies based on auth attributes |
+### Authenticated Playability Check Flow (in order)
+
+1. Check if country is completely blocked
+2. If user has `catalogue="all"` or prerelease access → automatically playable
+3. Check bootlegger status (free tier only, from Memcache)
+4. Validate sale periods match (user's catalogue + country)
+5. Check authorization groups via Casys (for purchased/gated content)
+6. Validate file format allowed for subscription tier
+7. Check abroad policy (free users must match home country)
+8. Check offline download permission (free users)
+9. Apply Content Control rules
+
+### Unauthenticated Playability Check Flow
+
+1. Check country not blocked
+2. Use `catalogue="free"` and geo-country
+3. Only AUDIO_EPISODE content type allowed
+4. Check format (no premium/lossless)
+5. Validate `allow_unauthenticated` flag
+
+### Format Restrictions
+
+| Category     | Formats                                              | Restriction                                   |
+| ------------ | ---------------------------------------------------- | --------------------------------------------- |
+| CENC (EME)   | MP4_128, MP4_256, MP4_FLAC, MP4_HE_AAC_V1_64/96      | Must use LICENSE_KEY endpoint                 |
+| Premium-only | OGG_VORBIS_320, MP4_256, MP4_256_DUAL, MP4_256_CBCS  | Premium users only                            |
+| Lossless     | FLAC_FLAC, FLAC_FLAC_24BIT, MP4_FLAC, MP4_FLAC_24BIT | LOSSLESS or VERY_HIGH tier; secure connection |
+| Free tier    | Bitrate <= 96kbps                                    | Free users limited to low quality             |
+
+### DRM Architecture
+
+All DRM services are stateless proxies over Key2:
+
+```
+Client → Edge → DRM Service → Key2 (key + playability) → DRM Response → Client
+Non-CENC: Client → PlayPlay → Key2 (returns obfuscated key)
+```
+
+| DRM Service       | Platforms           | Key Issues to Check                                         |
+| ----------------- | ------------------- | ----------------------------------------------------------- |
+| PlayPlay          | Non-CENC (OGG etc.) | Token denylist, bootleg detection, lossless client profiles |
+| Widevine License  | Android, Chrome     | Compromised CDM blocking, audio denylist, VMP enforcement   |
+| FairPlay License  | iOS, Safari         | Certificate versioning (legacy vs v26), protocol fallback   |
+| PlayReady License | Xbox, LG, Windows   | Audio client lockdown (specific client IDs only)            |
+| Director          | Video manifests     | Calls Key2 for playability, noauth endpoint skips checks    |
+
+### DRM Error Mapping from Key2
+
+| Key2 Status  | HTTP | Meaning                                       |
+| ------------ | ---- | --------------------------------------------- |
+| OK           | 200  | Key served, license generated                 |
+| RATE_LIMITED | 429  | Rate limit exceeded                           |
+| BAD_REQUEST  | 400  | Invalid content/file ID                       |
+| FORBIDDEN    | 403  | GRM denied (country, catalogue, format, etc.) |
+| NOT_FOUND    | 404  | Content key not in Key2                       |
+
+### Key Behavioral Notes
+
+- Key2 **never returns 404** — always serves a fallback dead key (`deadbeefdeadbeefdeadbeefdeadbeef`)
+- Debug endpoints return **timestamps** of last restriction update — use to detect propagation delays
+- Bootlegger detection combines: client ID spoofing, missing client-token, TLS fingerprint mismatch
+- Employee users with `catalogue="all"` bypass most restrictions
+- Trial users may appear as premium but have different effective catalogue — check trial flags
+
+### Common Key2 Scenarios
+
+**Metadata ↔ Key2 Desync:** Metadata shows available but Key2 denies (or vice versa). Compare restriction timestamps in DebugService response — stale timestamps = propagation delay.
+
+**Content Replacement:** Track/episode re-linked to new audio_id/source_id, Key2 still has restrictions for old file. Symptoms: metadata correct, Key2 debug shows stale data or unknown file_id.
+
+**Client Caching Stale Data:** Server-side checks pass but user can't play. Client may cache old file IDs or playability responses. Ask user to clear cache, reinstall, or test on different device.
+
+**Trial Users Appearing as Premium:** Certain trial types cause `catalogue=free` users to appear as premium. Check user account attributes for trial flags (e.g., `on-demand-trial`).
+
+### Rate Limiting Buckets
+
+| Bucket                            | Capacity | Fill Rate |
+| --------------------------------- | -------- | --------- |
+| interactive (normal)              | 300      | 0.3/s     |
+| interactive-strictness_low        | 200      | 0.2/s     |
+| interactive-strictness_medium     | 100      | 0.1/s     |
+| interactive-strictness_high       | 30       | 0.03/s    |
+| interactive-suspected_compromised | 30       | 0.001/s   |
+| download                          | 10000    | 0.46/s    |
