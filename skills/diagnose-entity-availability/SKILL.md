@@ -110,13 +110,17 @@ Dispatch all agents for the selected branch in a **single message** (parallel ex
 
 | Agent                 | Reference File                    | Key Checks                                                      |
 | --------------------- | --------------------------------- | --------------------------------------------------------------- |
-| Statements            | `references/statements.md`        | Entity existence, sale periods, taken_down, validity, auth info |
 | Casys                 | `references/casys.md`             | Per-group Member/NotMember, CONSUMPTION_CAPPED reason           |
 | Podcast-Sub-Ext       | `references/casys.md`             | is_paywalled, is_user_subscribed, explanation type              |
 | Entity-Access-Context | `references/casys.md`             | is_gated, access_types, how user could get access               |
 | Entity-Live-Status    | `references/availability.md`      | Validation status, live status                                  |
 | Availability-API      | `references/availability.md`      | Playability/visibility verdicts, policy decisions               |
 | Key2                  | `references/key2-restrictions.md` | Denial reasons, restriction timestamps, format checks           |
+| Statements (fallback) | `references/statements.md`        | Entity existence, sale periods, taken_down, validity, auth info |
+
+**Statements is a fallback** — episode-api/show-api triage already surfaces availability, auth groups, and content type. Only dispatch the Statements agent when triage returns NOT_FOUND, TAKEN_DOWN, or when you need raw sale periods/regional blocks that the triage doesn't expose. Statements has strict SA access policies and may be inaccessible.
+
+**Key2 requires audiophile hop** — Key2's IsPlayable/DebugService expects file IDs (20-byte, hex/base64), not the audio UUID from episode-api. Call `audiophile` `DebugService/Audio` with the audio UUID first to get file IDs, then pass those to Key2.
 
 Each subagent prompt should include: entity URI, user context, triage results, content type, and instruct it to read the reference file. Subagents report findings as `{service, status, diagnosis, evidence}`.
 
