@@ -10,27 +10,9 @@
   "method": "GetEpisodes",
   "payload": {
     "episode_uris": [{ "uri": "spotify:episode:XXXX" }],
-    "requested_fields": {
-      "paths": [
-        "availability",
-        "playability",
-        "audience_reach",
-        "authorization_groups",
-        "content_type",
-        "content_authorization_attributes",
-        "name",
-        "show_uri",
-        "episode_type",
-        "duration"
-      ]
-    },
+    "requested_fields": "availability,audience_reach,authorization_groups,content_type,content_authorization_attributes,name,show_uri,episode_type,original_audio,videos",
     "request_metadata": {
-      "user_info": {
-        "user_id": "<user_id>",
-        "market_country_iso": "<country>",
-        "catalogue": "<catalogue>",
-        "is_employee": false
-      },
+      "user_info": {},
       "component_id": "diagnose-entity-availability"
     }
   },
@@ -47,6 +29,10 @@
 - `audience_reach` — AUDIENCE_REACH_PAYWALL if gated
 - `authorization_groups[]` — `"namespace:group_id"` strings
 - `content_type` — PODCAST, CHAPTER, PODCAST_SHORT, LESSON, USER_HIGHLIGHT
+- `original_audio.uuid` — base64-encoded audio UUID (convert to hex for audiophile/Key2)
+- `videos[]` — video file IDs (for video playability checks)
+
+**Note:** `requested_fields` must be a comma-separated string, not an object with `paths`. The `request_metadata.user_info` should be `{}` — dynamo-mcp auto-fills it from the top-level `user_info`.
 
 ## show-api — GetShows
 
@@ -58,26 +44,9 @@
   "method": "GetShows",
   "payload": {
     "show_uris": [{ "uri": "spotify:show:XXXX" }],
-    "requested_fields": {
-      "paths": [
-        "availability",
-        "playability",
-        "audience_reach",
-        "authorization_groups",
-        "content_type",
-        "content_authorization_attributes",
-        "name",
-        "show_types",
-        "available_episode_count"
-      ]
-    },
+    "requested_fields": "availability,audience_reach,authorization_groups,content_type,content_authorization_attributes,name,show_types,available_episode_count",
     "request_metadata": {
-      "user_info": {
-        "user_id": "<user_id>",
-        "market_country_iso": "<country>",
-        "catalogue": "<catalogue>",
-        "is_employee": false
-      },
+      "user_info": {},
       "component_id": "diagnose-entity-availability"
     }
   },

@@ -63,12 +63,7 @@ dynamo_call_method:
   method: "GetEpisodes"
   payload: {
     "episode_uris": [{"uri": "<URI>"}],
-    "requested_fields": {
-      "paths": ["availability", "playability", "audience_reach",
-                "authorization_groups", "content_type",
-                "content_authorization_attributes", "name",
-                "show_uri", "episode_type"]
-    },
+    "requested_fields": "availability,audience_reach,authorization_groups,content_type,content_authorization_attributes,name,show_uri,episode_type,original_audio,videos",
     "request_metadata": {
       "user_info": {
         "user_id": "<user_id>",
@@ -82,11 +77,11 @@ dynamo_call_method:
   user_info: {"username": "<username>"}
 ```
 
-**For show/audiobook URIs** — use show-api `GetShows` with `show_uris` instead of `episode_uris`, and add `show_types` and `available_episode_count` to requested fields.
+**For show/audiobook URIs** — use show-api `GetShows` with `show_uris` instead of `episode_uris`, and add `show_types` and `available_episode_count` to requested fields. No `original_audio`/`videos` for shows.
 
 **If no user context**, omit `user_info` from both payload and top-level. Flag to user that availability won't be user-specific.
 
-**Extract:** `entity_status`, `availability.playability` + `restriction_details`, `availability.visibility`, `audience_reach`, `authorization_groups`, `content_type`, `name`.
+**Extract:** `entity_status`, `availability.playability` + `restriction_details`, `availability.visibility`, `audience_reach`, `authorization_groups`, `content_type`, `name`, `original_audio.uuid` (for Key2 checks), `videos` (for video playability).
 
 ## Phase 2: Branch Routing
 
