@@ -87,14 +87,14 @@ dynamo_call_method:
 
 | Triage Result                                 | Subagents (parallel)                                        | Needs User Context? |
 | --------------------------------------------- | ----------------------------------------------------------- | ------------------- |
-| `NOT_FOUND` / entity missing                  | Statements + entity-live-status                             | No                  |
+| `NOT_FOUND` / entity missing                  | entity-live-status + Statements                             | No                  |
 | `TAKEN_DOWN_FOR_LEGAL_REASONS`                | entity-live-status + Statements                             | No                  |
-| `PERMISSION_DENIED` (CCL block)               | Statements                                                  | No                  |
+| `PERMISSION_DENIED` (CCL block)               | entity-live-status + Statements                             | No                  |
 | Visible + not playable + `USER_LACKS_ACCESS`  | Casys + podcast-subscription-ext + entity-access-context    | Yes                 |
 | Visible + not playable + `CONSUMPTION_CAPPED` | Casys (Check + CheckWithoutCapping) + entity-access-context | Yes                 |
-| `COUNTRY_RESTRICTED`                          | Statements (sale periods) + availability-api                | Partial (market)    |
-| `CATALOGUE_RESTRICTED`                        | Statements (sale periods) + availability-api                | Partial (catalogue) |
-| Playable in metadata but audio won't play     | Key2 + Statements (transcoding/file IDs)                    | Yes                 |
+| `COUNTRY_RESTRICTED`                          | entity-live-status + availability-api                       | Partial (market)    |
+| `CATALOGUE_RESTRICTED`                        | entity-live-status + availability-api                       | Partial (catalogue) |
+| Playable in metadata but audio won't play     | Key2 + entity-live-status                                   | Yes                 |
 | Everything looks fine / unclear               | ALL agents                                                  | Best effort         |
 
 If user context is missing for a branch that needs it, run entity-level agents only and tell the user what can't be checked.
