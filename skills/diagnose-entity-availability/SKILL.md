@@ -113,7 +113,7 @@ Dispatch all agents for the selected branch in a **single message** (parallel ex
 | Key2                  | `references/key2-restrictions.md` | Denial reasons, restriction timestamps, format checks           |
 | Statements (fallback) | `references/statements.md`        | Entity existence, sale periods, taken_down, validity, auth info |
 
-**Statements is a fallback** — episode-api/show-api triage already surfaces availability, auth groups, and content type. Only dispatch the Statements agent when triage returns NOT_FOUND, TAKEN_DOWN, or when you need raw sale periods/regional blocks that the triage doesn't expose. Statements has strict SA access policies and may be inaccessible.
+**Statements is a last resort** — episode-api/show-api triage + entity-live-status cover almost everything. Only try Statements when all other services fail to explain the issue and you need raw source-of-truth data (sale periods, regional blocks, authorization grants). It has strict SA access policies and will likely be inaccessible.
 
 **Key2 requires audiophile hop** — Key2's IsPlayable/DebugService expects file IDs (20-byte, hex/base64), not the audio UUID from episode-api. Call `audiophile` `DebugService/Audio` with the audio UUID first to get file IDs, then pass those to Key2.
 
