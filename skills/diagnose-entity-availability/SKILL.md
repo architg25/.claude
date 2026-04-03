@@ -88,7 +88,7 @@ dynamo_call_method:
 | Triage Result                                 | Subagents (parallel)                                        | Needs User Context? |
 | --------------------------------------------- | ----------------------------------------------------------- | ------------------- |
 | `NOT_FOUND` / entity missing                  | Statements + entity-live-status                             | No                  |
-| `TAKEN_DOWN_FOR_LEGAL_REASONS`                | Statements                                                  | No                  |
+| `TAKEN_DOWN_FOR_LEGAL_REASONS`                | entity-live-status + Statements                             | No                  |
 | `PERMISSION_DENIED` (CCL block)               | Statements                                                  | No                  |
 | Visible + not playable + `USER_LACKS_ACCESS`  | Casys + podcast-subscription-ext + entity-access-context    | Yes                 |
 | Visible + not playable + `CONSUMPTION_CAPPED` | Casys (Check + CheckWithoutCapping) + entity-access-context | Yes                 |

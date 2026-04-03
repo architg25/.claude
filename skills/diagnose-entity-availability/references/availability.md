@@ -34,7 +34,7 @@ Use `dynamo_discover` to find the service first.
 
 ## entity-live-status — GetLiveStatus
 
-Use `dynamo_discover` to find the service first.
+Especially useful for `TAKEN_DOWN_FOR_LEGAL_REASONS` and `NOT_FOUND` — gives detailed reasons why an entity is unavailable, which show-api/episode-api don't expose.
 
 ```json
 {
@@ -43,8 +43,21 @@ Use `dynamo_discover` to find the service first.
   "service": "EntityLiveStatus",
   "method": "GetLiveStatus",
   "payload": {
-    "uri": "spotify:episode:XXXX",
+    "kind": "SHOW",
+    "uri": "spotify:show:XXXX",
     "country_code": "<country>"
   }
 }
 ```
+
+**`kind` values:** `SHOW`, `EPISODE`, `AUDIOBOOK`, `AUDIOBOOKCHAPTER`
+
+**Key response fields:**
+
+- `unavailableReasons[]` — list of `{type, description}` entries explaining why the entity is unavailable
+  - `VALIDATION` — failed validation (empty name, no cover art, no episodes, no transcoded media, etc.)
+  - `UNPUBLISHED` — entity is unpublished
+  - `BLOCKED_BY_SALE_PERIOD` — blocked in specific markets/catalogues at current time
+  - `RESTRICTED_LIFECYCLE` — restricted for streaming by its lifecycle state
+  - `TAKEN_DOWN` — explicitly taken down
+- `v4LiveStatus[]` / `v5LiveStatus[]` — which domains have the entity cached
