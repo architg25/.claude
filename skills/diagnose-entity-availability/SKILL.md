@@ -79,7 +79,7 @@ dynamo_call_method:
 
 **For show/audiobook URIs** — use show-api `GetShows` with `show_uris` instead of `episode_uris`, and add `show_types` and `available_episode_count` to requested fields. No `original_audio`/`videos` for shows.
 
-**If no user context**, omit `user_info` from both payload and top-level. Flag to user that availability won't be user-specific.
+**If no user context**, default to `market_country_iso: "GB"` and `catalogue: "premium"` in `request_metadata.user_info` (availability only needs market + catalogue, not a real user). Flag to the user that you're using defaults. For user-specific checks (Casys, subscription), a real user identifier is still needed.
 
 **Extract:** `entity_status`, `availability.playability` + `restriction_details`, `availability.visibility`, `audience_reach`, `authorization_groups`, `content_type`, `name`, `original_audio.uuid` (for Key2 checks), `videos` (for video playability).
 
